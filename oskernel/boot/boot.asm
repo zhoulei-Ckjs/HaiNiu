@@ -1,6 +1,9 @@
 ; BIOS程序会将磁盘的第一个扇区的512字节加载到0x7c00处，为引导程序
 [ORG  0x7c00]
 
+[SECTION .data]
+BOOT_MAIN_ADDR equ 0x500        ; setup.asm保存在这里，是由boot进行跳转的地址
+
 ; 代码段
 [SECTION .text]
 [BITS 16]           ; 编码方式
@@ -12,19 +15,11 @@ _start:
     mov ax, 3
     int 0x10        ;调用0x10号中断
 
-    ; 清空所有寄存器
-    mov     ax, 0
-    mov     ss, ax
-    mov     ds, ax
-    mov     es, ax
-    mov     fs, ax
-    mov     gs, ax
-    mov     si, ax
+    ; -------------------------------------------------to do------------------------------------------
+    ; 需要将磁盘第二扇区的内容读到0x500处，然后跳转到0x500处继续执行
+    ; ------------------------------------------------------------------------------------------------
 
-    mov     si, msg
-    call    print
-
-    jmp     $       ;停在这里，看屏幕是否被clear
+    jmp $           ; 停在这里，程序结束
 
 ; 如何调用
 ; mov     si, msg   ; 1 传入字符串
@@ -44,9 +39,8 @@ print:
 .done:
     ret
 
-; 定义一个hello world字符串
-msg:
-    db "hello, world", 10, 13, 0
+jmp_to_setup:
+    db "jump to setup...", 10, 13, 0
 
 ; 一个扇区要以0x55aa结尾，BIOS才能识别
 times 510 - ($ - $$) db 0
