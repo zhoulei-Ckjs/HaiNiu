@@ -18,5 +18,10 @@ clean:
 bochs: all
 	bochs -q -f bochsrc
 
+qemug: all
+	qemu-system-x86_64 -hda hd.img -S -s
+	# -S 	启动后暂停服务
+	# -s	开启调试选项 -gdb tcp::1234 的缩写
+
 qemu: all
 	qemu-system-x86_64 -hda hd.img
