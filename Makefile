@@ -19,9 +19,16 @@ bochs: all
 	bochs -q -f bochsrc
 
 qemug: all
-	qemu-system-x86_64 -hda hd.img -S -s
-	# -S 	启动后暂停服务
-	# -s	开启调试选项 -gdb tcp::1234 的缩写
+	qemu-system-x86_64 -m 32M -hda hd.img -S -s
+	# -m 32M	虚拟机内存32M
+	# -S 		启动后暂停服务
+	# -s		开启调试选项 -gdb tcp::1234 的缩写
 
 qemu: all
-	qemu-system-x86_64 -hda hd.img
+	qemu-system-x86_64 -m 32M -hda hd.img
+
+# 增加VM Virtual Box使用的虚拟机
+vmdk: $(BUILD)/master.vmdk
+
+$(BUILD)/master.vmdk: hd.img
+	qemu-img convert -O vmdk $< $@
