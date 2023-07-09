@@ -14,10 +14,20 @@ _start:
     mov ax, 3
     int 0x10        ;调用0x10号中断
 
+    ; 跳过去
+    mov si, jmp_to_setup
+    call print
+
     ; 将setup读入0x500处，通过硬盘寄存器读硬盘
-    mov ecx, 2      ; 从哪个扇区开始读，CHS读硬盘方式是以下标1开始的，所以第二个扇区就是2
+    ; chs扇区下标从1开始，而lba扇区下标从0开始，所以这里改为了1，原因是我们要给0x1f6（硬盘寄存器）传递 0b 1110_0000
+    mov ecx, 1      ; 从哪个扇区开始读，lba读硬盘方式是以下标0开始的，所以第二个扇区就是1
     mov bl, 1       ; 读取扇区数量
 
+    call read_disk  ; 读取磁盘
+
+    jmp BOOT_MAIN_ADDR  ; 跳转到setup
+
+read_disk:
     ; 0x1f2 8bit 指定读取或写入的扇区数
     mov dx, 0x1f2
     mov al, bl      ; 扇区数
@@ -30,12 +40,13 @@ _start:
 
     ; 0x1f4 8bit lba地址的中八位 8-15
     inc dx
-    mov al, ch      ; LBA中8位
+    shr ecx, 8
+    mov al, cl      ; LBA中8位
     out dx, al
 
     ; 0x1f5 8bit iba地址的高八位 16-23
     inc dx
-    shr ecx, 16     ; 右移16位
+    shr ecx, 8      ; 右移8位
     mov al, cl
     out dx, al      ; 发送LBA高8位
 
@@ -45,9 +56,11 @@ _start:
     ; 5、7位固定为1
     ; 6 0表示CHS模式，1表示LAB模式
     inc dx
-    mov al, ch      ; LBA最高4位
-    and al, 0b1110_1111
-    out dx, al
+    shr ecx, 8
+    and cl, 0b1111      ; 将高四位置为 0
+    mov al, 0b1110_0000 ;
+    or al, cl
+    out dx, al; 主盘 - LBA 模式
 
     ; 0x1f7 8bit  命令或状态端口
     inc dx
@@ -74,12 +87,7 @@ _start:
     mov [edi], ax       ; 放到edi的位置
     add edi, 2
     loop .read_data
-
-    ; 跳过去
-    mov     si, jmp_to_setup
-    call    print
-
-    jmp BOOT_MAIN_ADDR
+    ret
 
 ; 如何调用
 ; mov     si, msg   ; 1 传入字符串
@@ -104,4 +112,7 @@ jmp_to_setup:
 
 ; 一个扇区要以0x55aa结尾，BIOS才能识别
 times 510 - ($ - $$) db 0
+
+; 主引导扇区的最后两个字节必须是 0x55 0xaa
+; dw 0xaa55
 db 0x55, 0xaa

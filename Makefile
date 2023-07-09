@@ -25,7 +25,10 @@ qemug: all
 	# -s		开启调试选项 -gdb tcp::1234 的缩写
 
 qemu: all
-	qemu-system-x86_64 -m 32M -hda hd.img
+	qemu-system-i386 \
+    -m 32M \
+    -boot c \
+    -hda ./hd.img
 
 # 增加VM Virtual Box使用的虚拟机
 vmdk: $(BUILD)/master.vmdk
