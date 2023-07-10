@@ -12,18 +12,26 @@ _start:
     ; 当值为3时，这个调用的功能是设置视频模式。具体来说，视频模式3对应于文本模式80列×25行，16色，8页。
     ; 这通常被认为是典型的DOS文本模式。
     mov ax, 3
-    int 0x10        ;调用0x10号中断
+    int 0x10        ; 调用0x10号中断
+
+    ; 初始化寄存器
+    mov ax, 0
+    mov ds, ax
+    mov es, ax
+    mov ss, ax
+    mov sp, 0x7c00  ; 初始化栈顶指针
+
+    ; 将setup读入0x500处，通过硬盘寄存器读硬盘
+    ; chs扇区下标从1开始，而lba扇区下标从0开始，第二个扇区所以这里改为了1，
+    ; 我们要给0x1f6（硬盘寄存器）传递 0b 1110_0000表示lba模式
+    mov ecx, 1      ; 从哪个扇区开始读
+    mov bl, 1       ; 读取扇区数量
+
+    call read_disk  ; 读取磁盘
 
     ; 跳过去
     mov si, jmp_to_setup
     call print
-
-    ; 将setup读入0x500处，通过硬盘寄存器读硬盘
-    ; chs扇区下标从1开始，而lba扇区下标从0开始，所以这里改为了1，原因是我们要给0x1f6（硬盘寄存器）传递 0b 1110_0000
-    mov ecx, 1      ; 从哪个扇区开始读，lba读硬盘方式是以下标0开始的，所以第二个扇区就是1
-    mov bl, 1       ; 读取扇区数量
-
-    call read_disk  ; 读取磁盘
 
     jmp BOOT_MAIN_ADDR  ; 跳转到setup
 
