@@ -1,6 +1,8 @@
 ; 0柱面0磁道2扇區
 [ORG 0x500]         ;将setup放到0x500处
 
+dw 0x55aa           ; 魔数，用于判断错误
+
 [SECTION .text]
 [BITS 16]
 global _start

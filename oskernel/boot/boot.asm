@@ -12,18 +12,17 @@ _start:
     ; 当值为3时，这个调用的功能是设置视频模式。具体来说，视频模式3对应于文本模式80列×25行，16色，8页。
     ; 这通常被认为是典型的DOS文本模式。
     mov ax, 3
-    int 0x10        ; 调用0x10号中断
+    int 0x10        ;调用0x10号中断
 
-    ; 初始化寄存器
+    ; 初始化段寄存器
     mov ax, 0
     mov ds, ax
     mov es, ax
     mov ss, ax
-    mov sp, 0x7c00  ; 初始化栈顶指针
+    mov sp, 0x7c00
 
     ; 将setup读入0x500处，通过硬盘寄存器读硬盘
-    ; chs扇区下标从1开始，而lba扇区下标从0开始，第二个扇区所以这里改为了1，
-    ; 我们要给0x1f6（硬盘寄存器）传递 0b 1110_0000表示lba模式
+    ; chs扇区下标从1开始，而lba扇区下标从0开始，所以这里改为了0，原因是我们要给0x1f6（硬盘寄存器）传递 0b 1110_0000
     mov ecx, 1      ; 从哪个扇区开始读
     mov bl, 1       ; 读取扇区数量
 
@@ -33,7 +32,11 @@ _start:
     mov si, jmp_to_setup
     call print
 
-    jmp BOOT_MAIN_ADDR  ; 跳转到setup
+    ; 检测0x500位置开头是否是0x55aa，因为在setup最开始定义了0x55aa
+    cmp word [0x500], 0x55aa
+    jnz error
+    jmp BOOT_MAIN_ADDR + 2  ; 跳转到setup
+    jmp $                   ; 阻塞
 
 read_disk:
     ; 0x1f2 8bit 指定读取或写入的扇区数
@@ -114,6 +117,13 @@ print:
     jmp .loop
 .done:
     ret
+
+error:
+    mov si, .msg
+    call print
+    hlt             ; 让 CPU 停止
+    jmp $
+.msg db "Load setup error!!!", 10, 13, 0
 
 jmp_to_setup:
     db "jump to setup...", 10, 13, 0
