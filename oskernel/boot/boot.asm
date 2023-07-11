@@ -126,7 +126,7 @@ error:
 .msg db "Load setup error!!!", 10, 13, 0
 
 jmp_to_setup:
-    db "jump to setup...", 10, 13, 0
+    db "[boot.asm] : jump to setup...", 10, 13, 0
 
 ; 一个扇区要以0x55aa结尾，BIOS才能识别
 times 510 - ($ - $$) db 0
