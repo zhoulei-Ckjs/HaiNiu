@@ -28,3 +28,7 @@ print:
 
 loading:
     db "[setup.asm] : Preparing to enter protect mode ...", 10, 13, 0     ; \n\r
+
+[SECTION .gdt]
+gdt_base:
+    dd 0, 0                     ; gdt表的最开始是一个空表，占8字节
