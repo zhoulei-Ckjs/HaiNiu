@@ -21,6 +21,15 @@ gdt_code:
     ;    G_DB_AVL_LIMIT
     db 0b1_1_00_0000 | (MEMORY_LIMIT >> 16 & 0xf)       ; 以4k为单位_32位段_非64位代码段_段界限（最高4位）
     db (MEMORY_BASE >> 24) & 0xff                       ; 段基址，31-24
+gdt_data:
+    dw MEMORY_LIMIT & 0xffff
+    dw MEMORY_BASE & 0xffff
+    db (MEMORY_BASE >> 16) & 0xff
+    ;    P_DPL_S_TYPE
+    db 0b1_00_1_0010                                    ; 段描述符有效_工作在ring0_非系统段_仅具有只读权限
+    ;    G_DB_AVL_LIMIT
+    db 0b1_1_00_0000 | ((MEMORY_LIMIT >> 16) & 0xf)     ; 以4KB为单位_32位段_非64位代码段_段界限（最高4位）
+    db MEMORY_BASE >> 24 & 0xff
 
 ; 代码段
 [SECTION .text]
