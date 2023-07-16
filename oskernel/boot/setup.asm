@@ -4,9 +4,14 @@
 dw 0x55aa           ; 定义的第一个数，魔数，用于判断是否读盘错误
 
 [SECTION .data]
+;----------------
 ; 构建gdt表用数据
+;----------------
 MEMORY_BASE equ 0                                               ; 内存开始的位置：基地址
 MEMORY_LIMIT equ ((1024 * 1024 * 1024 * 4) / (1024 * 4)) - 1    ; 段界限，20位寻址能力，内存是以4k为一单位划分的
+; 选择子，后面进入保护模式就是通过 选择子 访问 描述符 再+ 偏移来访问数据
+code_selector equ (1 << 3)                                      ; 代码段选择子，左移3位是最后三位是属性
+data_selector equ (2 << 3)                                      ; 数据段选择子
 
 ; gdt段，用于构建全局描述符表（global descriptor table）
 [SECTION .gdt]
@@ -30,6 +35,10 @@ gdt_data:
     ;    G_DB_AVL_LIMIT
     db 0b1_1_00_0000 | ((MEMORY_LIMIT >> 16) & 0xf)     ; 以4KB为单位_32位段_非64位代码段_段界限（最高4位）
     db MEMORY_BASE >> 24 & 0xff
+; 加载gdt表用gdt_ptr指针
+gdt_ptr:
+    dw $ - gdt_base - 1         ; 这里是gdtlen - 1，长度-1
+    dd gdt_base                 ; GDT基地址
 
 ; 代码段
 [SECTION .text]
