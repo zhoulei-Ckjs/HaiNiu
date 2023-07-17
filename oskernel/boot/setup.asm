@@ -49,7 +49,15 @@ _setup_start:
     mov     si, loading
     call    print
 
-    jmp     $       ; 停在这里
+    cli                         ; 关闭中断
+    ; 打开 A20 线
+    in    al,  92h
+    or    al,  00000010b
+    out   92h, al
+
+    lgdt [gdt_ptr]              ; 加载 gdt
+
+    jmp     $                   ; 停在这里
 
 ; 如何调用
 ; mov     si, msg   ; 1 传入字符串
