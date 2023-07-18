@@ -57,8 +57,29 @@ _setup_start:
 
     lgdt [gdt_ptr]              ; 加载 gdt
 
-    jmp     $                   ; 停在这里
+    ; 启动保护模式
+    mov eax, cr0
+    or eax, 1
+    mov cr0, eax
 
+    ; 用跳转来刷新缓存，启用保护模式
+    jmp dword code_selector:protect_mode
+
+[bits 32]
+protect_mode:
+    ; xchg bx, bx; 断点
+    mov ax, data_selector
+    mov ds, ax
+    mov es, ax
+    mov fs, ax
+    mov gs, ax
+    mov ss, ax                  ; 初始化段寄存器
+
+
+    jmp $                       ; 停在这里
+
+; 注意这里要加一个bit 16，因为没进入保护模式前调用32位编码的函数会报错 eip > cs.limit
+[BITS 16]
 ; 如何调用
 ; mov     si, msg   ; 1 传入字符串
 ; call    print     ; 2 调用
