@@ -2,11 +2,22 @@ BUILD:=./build
 
 HD_IMG_NAME:= "hd.img"
 
-all: ${BUILD}/boot/boot.o ${BUILD}/boot/setup.o
+all: ${BUILD}/boot/boot.o ${BUILD}/boot/setup.o ${BUILD}/system.bin
 	$(shell rm -rf $(HD_IMG_NAME))
 	bximage -q -hd=16 -func=create -sectsize=512 -imgmode=flat $(HD_IMG_NAME)
 	dd if=${BUILD}/boot/boot.o of=$(HD_IMG_NAME) bs=512 seek=0 count=1 conv=notrunc
 	dd if=${BUILD}/boot/setup.o of=$(HD_IMG_NAME) bs=512 seek=1 count=2 conv=notrunc
+	dd if=${BUILD}/system.bin of=$(HD_IMG_NAME) bs=512 seek=3 count=60 conv=notrunc
+
+${BUILD}/system.bin: ${BUILD}/kernel.bin
+	objcopy -O binary ${BUILD}/kernel.bin ${BUILD}/system.bin
+	nm ${BUILD}/kernel.bin | sort > ${BUILD}/system.map
+
+${BUILD}/boot/head.o: oskernel/boot/head.asm
+	nasm -f elf32 -g $< -o $@
+
+${BUILD}/kernel.bin: ${BUILD}/boot/head.o
+	ld -m elf_i386 $^ -o $@ -Ttext 0x9000
 
 ${BUILD}/boot/%.o: oskernel/boot/%.asm
 	$(shell mkdir -p ${BUILD}/boot)
@@ -14,6 +25,7 @@ ${BUILD}/boot/%.o: oskernel/boot/%.asm
 
 clean:
 	$(shell rm -rf ${BUILD})
+	$(shell rm -rf hd.img)
 
 bochs: all
 	bochs -q -f bochsrc
