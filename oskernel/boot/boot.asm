@@ -23,8 +23,9 @@ _start:
 
     ; 将setup读入0x500处，通过硬盘寄存器读硬盘
     ; chs扇区下标从1开始，而lba扇区下标从0开始，所以这里改为了0，原因是我们要给0x1f6（硬盘寄存器）传递 0b 1110_0000
-    mov ecx, 1      ; 从哪个扇区开始读
-    mov bl, 1       ; 读取扇区数量
+    mov ecx, 1                  ; 从哪个扇区开始读
+    mov bl, 1                   ; 读取扇区数量
+    mov edi, BOOT_MAIN_ADDR     ; 读取的数据要写入到哪里
 
     call read_disk  ; 读取磁盘
 
@@ -38,6 +39,11 @@ _start:
     jmp BOOT_MAIN_ADDR + 2  ; 跳转到setup
     jmp $                   ; 阻塞
 
+; lba方式读盘操作
+; 调用方式：
+; mov ecx, XXX      ; 从哪个扇区开始读，lba扇区下标从0开始
+; mov bl, XXX       ; 读取扇区数量
+; mov edi, XXX      ; 读取的数据要写入到哪里
 read_disk:
     ; 0x1f2 8bit 指定读取或写入的扇区数
     mov dx, 0x1f2
@@ -78,6 +84,16 @@ read_disk:
     mov al, 0x20    ; 发送读盘命令
     out dx, al
 
+    ; 清空循环次数
+    xor ecx, ecx
+    mov cl, bl          ; 得到读写扇区的数量
+.read_sector:
+    push cx             ; 保存 cx
+    call .read_check    ; 读取一个扇区
+    pop cx              ; 恢复 cx
+    loop .read_sector
+    ret
+
     ; 检测硬盘状态
     ; 3 0表示硬盘未准备好与主机交换数据 1表示准备好了
     ; 7 0表示硬盘不忙 1表示硬盘忙
@@ -92,7 +108,6 @@ read_disk:
     ; 从0x1f0 读数据
     mov dx, 0x1f0
     mov cx, 256         ; 要循环256次，每次读 2 字节
-    mov edi, BOOT_MAIN_ADDR
 .read_data:
     in ax, dx           ; 读取 2 字节
     mov [edi], ax       ; 放到edi的位置
