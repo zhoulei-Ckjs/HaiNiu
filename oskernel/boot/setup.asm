@@ -13,6 +13,12 @@ MEMORY_LIMIT equ ((1024 * 1024 * 1024 * 4) / (1024 * 4)) - 1    ; 段界限，20
 code_selector equ (1 << 3)                                      ; 代码段选择子，左移3位是最后三位是属性
 data_selector equ (2 << 3)                                      ; 数据段选择子
 
+
+;----------------
+; 内核用数据
+;----------------
+KERNEL_MAIN_ADDR equ 0x10000    ; kernel保存在这里，是由setup进行跳转的地址
+
 ; gdt段，用于构建全局描述符表（global descriptor table）
 [SECTION .gdt]
 gdt_base:
@@ -75,6 +81,12 @@ protect_mode:
     mov gs, ax
     mov ss, ax                  ; 初始化段寄存器
 
+    mov esp, 0x10000            ; 修改栈顶
+
+    mov ecx, 3                  ; 起始扇区
+    mov bl, 60                  ; 扇区数量
+    mov edi, KERNEL_MAIN_ADDR   ; 读取的目标内存
+    call read_disk              ; 读取磁盘
 
     jmp $                       ; 停在这里
 
