@@ -73,7 +73,7 @@ _setup_start:
 
 [bits 32]
 protect_mode:
-    ; xchg bx, bx; 断点
+; xchg bx, bx        ; 断点 --------------------------------------------------------------------
     mov ax, data_selector
     mov ds, ax
     mov es, ax
@@ -89,16 +89,48 @@ protect_mode:
     call read_disk              ; 读取磁盘
 
     ; 检测 KERNEL_MAIN_ADDR 位置开头是否是0x55aa，因为在 kernel 最开始定义了0x55aa
-    cmp word [KERNEL_MAIN_ADDR], 0x55aa
-    jnz error
-    ; jmp KERNEL_MAIN_ADDR + 2      ; 跳转到setup
-    jmp $                           ; 阻塞
+    cmp word [KERNEL_MAIN_ADDR], 0x55ab
+    jnz p_error                 ; 打印加载错误的信息
+    ; jmp KERNEL_MAIN_ADDR + 2    ; 跳转到setup
+    jmp $                       ; 阻塞
 
-; 待实现
+p_error:
+    mov eax, 2                  ; 要打印的位置-行
+    mov ebx, 0                  ; 要打印的位置-列
+    jmp error
+
+; 打印加载内核错误，在保护模式下打印，就是将字符串写到0xb8000的位置
+; 调用方式：
+    ;    mov eax, 3                  ; 要打印的位置-行
+    ;    mov ebx, 0                  ; 要打印的位置-列
+    ;    jmp error
 error:
-    mov byte [0xb8000], 'B'         ; 向显存写数据
-    mov byte [0xb8001], 'X'
-    jmp $
+    ; 计算显示位置，每行80个字符，一个字符2个字节
+    imul eax, 80
+    add eax, ebx
+    imul eax, 2
+
+    add eax, 0xb8000        ; 要显示的位置
+    mov edi, eax
+
+    xor esi, esi
+    mov esi, .error_data    ; 要显示的字符串
+
+    cld                             ; 使得串操作向前
+    mov ah, 0ch                     ; 黑底红字
+
+.1:
+	lodsb							; 从ds:si中读取1个字符到al中
+	test al, al						; 用于判断al是否为0，若是0则会将ZF置为1
+	jz .2							; 若ZF为1，跳转到.2
+	mov [gs:edi], ax				; 将字符放到视频地址
+	add edi, 2						; 增加2个字节
+	jmp .1
+.2:									; 显示完毕
+	jmp $							; 停到当前不动
+.error_data:
+    db "[setup.asm] : error loading kernel ...", 0
+    ; 意味着读取内核到内存出现了错误
 
 ; 读取磁盘代码（lba方式读盘），供32位保护模式调用，实模式下不可调用（因为放在了bits 32下了）
 ; 调用方式：
