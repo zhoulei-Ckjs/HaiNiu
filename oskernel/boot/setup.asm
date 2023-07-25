@@ -88,7 +88,17 @@ protect_mode:
     mov edi, KERNEL_MAIN_ADDR   ; 读取的目标内存
     call read_disk              ; 读取磁盘
 
-    jmp $                       ; 停在这里
+    ; 检测 KERNEL_MAIN_ADDR 位置开头是否是0x55aa，因为在 kernel 最开始定义了0x55aa
+    cmp word [KERNEL_MAIN_ADDR], 0x55aa
+    jnz error
+    ; jmp KERNEL_MAIN_ADDR + 2      ; 跳转到setup
+    jmp $                           ; 阻塞
+
+; 待实现
+error:
+    mov byte [0xb8000], 'B'         ; 向显存写数据
+    mov byte [0xb8001], 'X'
+    jmp $
 
 ; 读取磁盘代码（lba方式读盘），供32位保护模式调用，实模式下不可调用（因为放在了bits 32下了）
 ; 调用方式：
