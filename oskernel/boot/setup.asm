@@ -89,7 +89,7 @@ protect_mode:
     call read_disk              ; 读取磁盘
 
     ; 检测 KERNEL_MAIN_ADDR 位置开头是否是0x55aa，因为在 kernel 最开始定义了0x55aa
-    cmp word [KERNEL_MAIN_ADDR], 0x55ab
+    cmp word [KERNEL_MAIN_ADDR], 0x55aa
     jnz p_error                 ; 打印加载错误的信息
     ; jmp KERNEL_MAIN_ADDR + 2    ; 跳转到setup
     jmp $                       ; 阻塞
