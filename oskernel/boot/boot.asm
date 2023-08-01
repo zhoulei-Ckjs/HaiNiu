@@ -7,24 +7,17 @@ BOOT_MAIN_ADDR equ 0x500        ; setup.asm保存在这里，是由boot进行跳
 ; 代码段
 [SECTION .text]
 [BITS 16]           ; 编码方式
-global _start       ; 声明一个全局函数
-_start:
+global boot_start   ; 声明一个全局函数
+boot_start:
     ; 当值为3时，这个调用的功能是设置视频模式。具体来说，视频模式3对应于文本模式80列×25行，16色，8页。
     ; 这通常被认为是典型的DOS文本模式。
     mov ax, 3
-    int 0x10        ;调用0x10号中断
-
-    ; 初始化段寄存器
-    mov ax, 0
-    mov ds, ax
-    mov es, ax
-    mov ss, ax
-    mov sp, 0x7c00
+    int 0x10        ; 调用0x10号中断
 
     ; 将setup读入0x500处，通过硬盘寄存器读硬盘
     ; chs扇区下标从1开始，而lba扇区下标从0开始，所以这里改为了0，原因是我们要给0x1f6（硬盘寄存器）传递 0b 1110_0000
     mov ecx, 1                  ; 从哪个扇区开始读
-    mov bl, 1                   ; 读取扇区数量
+    mov bl, 2                   ; 读取扇区数量
     mov edi, BOOT_MAIN_ADDR     ; 读取的数据要写入到哪里
 
     call read_disk  ; 读取磁盘
@@ -37,7 +30,6 @@ _start:
     cmp word [0x500], 0x55aa
     jnz error
     jmp BOOT_MAIN_ADDR + 2  ; 跳转到setup
-    jmp $                   ; 阻塞
 
 ; lba方式读盘操作
 ; 调用方式：
@@ -138,10 +130,11 @@ error:
     call print
     hlt             ; 让 CPU 停止
     jmp $
-.msg db "Load setup error!!!", 10, 13, 0
+.msg:
+    db "Load setup error !!!", 10, 13, 0
 
 jmp_to_setup:
-    db "[boot.asm] : jump to setup...", 10, 13, 0
+    db "[boot.asm] : Jump to setup ...", 10, 13, 0
 
 ; 一个扇区要以0x55aa结尾，BIOS才能识别
 times 510 - ($ - $$) db 0
