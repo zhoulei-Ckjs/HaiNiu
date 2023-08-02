@@ -10,8 +10,8 @@ dw 0x55aa           ; 定义的第一个数，魔数，用于判断是否读盘�
 MEMORY_BASE equ 0                                               ; 内存开始的位置：基地址
 MEMORY_LIMIT equ ((1024 * 1024 * 1024 * 4) / (1024 * 4)) - 1    ; 段界限，20位寻址能力，内存是以4k为一单位划分的
 ; 选择子，后面进入保护模式就是通过 选择子 访问 描述符 再+ 偏移来访问数据
-code_selector equ (1 << 3)                                      ; 代码段选择子，左移3位是最后三位是属性
-data_selector equ (2 << 3)                                      ; 数据段选择子
+CODE_SELECTOR equ (1 << 3)                                      ; 代码段选择子，左移3位是最后三位是属性
+DATA_SELECTOR equ (2 << 3)                                      ; 数据段选择子
 
 
 ;----------------
@@ -30,7 +30,7 @@ gdt_code:
     ;    P_DPL_S_TYPE
     db 0b1_00_1_1010                                    ; 段描述符有效_工作在ring0_非系统段_仅具有执行权限 & 可读
     ;    G_DB_AVL_LIMIT
-    db 0b1_1_00_0000 | (MEMORY_LIMIT >> 16 & 0xf)       ; 以4k为单位_32位段_非64位代码段_段界限（最高4位）
+    db 0b0_1_00_0000 | (MEMORY_LIMIT >> 16 & 0xf)       ; 以1B为单位_32位段_非64位代码段_段界限（最高4位）
     db (MEMORY_BASE >> 24) & 0xff                       ; 段基址，31-24
 gdt_data:
     dw MEMORY_LIMIT & 0xffff
@@ -51,10 +51,21 @@ gdt_ptr:
 [BITS 16]
 global _setup_start
 _setup_start:
+    ; 清空寄存器
+    mov     ax, 0
+    mov     ss, ax
+    mov     ds, ax
+    mov     es, ax
+    mov     fs, ax
+    mov     gs, ax
+    mov     si, ax
+
     ; 由setup进入保护模式，需要构建gdt表，这里先把注释写好
     mov     si, loading
     call    print
 
+; 进入保护模式
+enter_protected_mode:
     cli                         ; 关闭中断
     ; 打开 A20 线
     in    al,  92h
@@ -65,15 +76,15 @@ _setup_start:
 
     ; 启动保护模式
     mov eax, cr0
-    or eax, 1
+    or  eax, 1
     mov cr0, eax
 
     ; 用跳转来刷新缓存，启用保护模式
-    jmp dword code_selector:protect_mode
+    jmp dword CODE_SELECTOR:protected_mode
 
-[bits 32]
-protect_mode:
-    mov ax, data_selector
+[BITS 32]
+protected_mode:
+    mov ax, DATA_SELECTOR
     mov ds, ax
     mov es, ax
     mov fs, ax
@@ -90,7 +101,7 @@ protect_mode:
     ; 检测 KERNEL_MAIN_ADDR 位置开头是否是0x55aa，因为在 kernel 最开始定义了0x55aa
     cmp word [KERNEL_MAIN_ADDR], 0x55aa
     jnz p_error                 ; 打印加载错误的信息
-    jmp dword code_selector:KERNEL_MAIN_ADDR + 2        ; 跳转到 head
+    jmp dword CODE_SELECTOR:KERNEL_MAIN_ADDR + 2        ; 跳转到 head
     ud2                         ; 表示出错，未定义行为
 
 p_error:
