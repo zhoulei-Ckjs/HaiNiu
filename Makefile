@@ -28,7 +28,7 @@ ${BUILD}/system.bin: ${BUILD}/kernel.bin
 
 ${BUILD}/kernel.bin: ${BUILD}/boot/head.o \
 	${BUILD}/init/main.o
-	ld -m elf_i386 $^ -o $@ -Ttext 0x10000
+	ld -m elf_i386 $^ -o $@ -Ttext 0x1200
 
 ${BUILD}/init/main.o: oskernel/init/main.c
 	$(shell mkdir -p ${BUILD}/init)
@@ -70,3 +70,4 @@ vmdk: $(BUILD)/master.vmdk
 
 $(BUILD)/master.vmdk: hd.img
 	qemu-img convert -O vmdk $< $@
+

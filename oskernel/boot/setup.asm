@@ -17,7 +17,7 @@ DATA_SELECTOR equ (2 << 3)                                      ; 数据段选�
 ;----------------
 ; 内核用数据
 ;----------------
-KERNEL_MAIN_ADDR equ 0x10000    ; kernel保存在这里，是由setup进行跳转的地址
+KERNEL_MAIN_ADDR equ 0x1200    ; kernel保存在这里，是由setup进行跳转的地址
 
 ; gdt段，用于构建全局描述符表（global descriptor table）
 [SECTION .gdt]
@@ -91,7 +91,7 @@ protected_mode:
     mov gs, ax
     mov ss, ax                  ; 初始化段寄存器
 
-    mov esp, 0x10000            ; 修改栈顶
+    mov esp, 0x9fbff            ; 修改栈顶
 
     mov ecx, 3                  ; 起始扇区
     mov bl, 60                  ; 扇区数量
