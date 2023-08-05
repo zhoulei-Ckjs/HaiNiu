@@ -79,11 +79,12 @@ enter_protected_mode:
     or  eax, 1
     mov cr0, eax
 
-    ; 用跳转来刷新缓存，启用保护模式
+    ; 用跳转来刷新缓存，启用保护模式，跳转后cs寄存器自动刷新了，所以在保护模式下就不用给cs赋值了
     jmp dword CODE_SELECTOR:protected_mode
 
 [BITS 32]
 protected_mode:
+    ; 清空寄存器，不然都是之前的数据
     mov ax, DATA_SELECTOR
     mov ds, ax
     mov es, ax
@@ -91,6 +92,7 @@ protected_mode:
     mov gs, ax
     mov ss, ax                  ; 初始化段寄存器
 
+    ; 这个地址的设置是参考 BIOS 内存的可用区域设置的
     mov esp, 0x9fbff            ; 修改栈顶
 
     mov ecx, 3                  ; 起始扇区
