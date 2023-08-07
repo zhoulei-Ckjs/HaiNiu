@@ -27,8 +27,13 @@ ${BUILD}/system.bin: ${BUILD}/kernel.bin
 	nm ${BUILD}/kernel.bin | sort > ${BUILD}/system.map
 
 ${BUILD}/kernel.bin: ${BUILD}/boot/head.o \
-	${BUILD}/init/main.o
+	${BUILD}/init/main.o \
+	${BUILD}/kernel/chr_drv/console.o
 	ld -m elf_i386 $^ -o $@ -Ttext 0x1200
+
+${BUILD}/kernel/chr_drv/%.o: oskernel/kernel/chr_drv/%.c
+	$(shell mkdir -p ${BUILD}/kernel/chr_drv)
+	gcc ${CFLAGS} ${DEBUG} -c $< -o $@
 
 ${BUILD}/init/main.o: oskernel/init/main.c
 	$(shell mkdir -p ${BUILD}/init)
