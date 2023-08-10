@@ -28,12 +28,17 @@ ${BUILD}/system.bin: ${BUILD}/kernel.bin
 
 ${BUILD}/kernel.bin: ${BUILD}/boot/head.o \
 	${BUILD}/init/main.o \
-	${BUILD}/kernel/chr_drv/console.o
+	${BUILD}/kernel/chr_drv/console.o \
+	${BUILD}/kernel/asm/io.o
 	ld -m elf_i386 $^ -o $@ -Ttext 0x1200
 
 ${BUILD}/kernel/chr_drv/%.o: oskernel/kernel/chr_drv/%.c
 	$(shell mkdir -p ${BUILD}/kernel/chr_drv)
 	gcc ${CFLAGS} ${DEBUG} -c $< -o $@
+
+${BUILD}/kernel/asm/%.o: oskernel/kernel/asm/%.asm
+	$(shell mkdir -p ${BUILD}/kernel/asm)
+	nasm -f elf32 -g $< -o $@
 
 ${BUILD}/init/main.o: oskernel/init/main.c
 	$(shell mkdir -p ${BUILD}/init)
