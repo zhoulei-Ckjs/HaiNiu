@@ -17,6 +17,14 @@
 #define CRT_CURSOR_H 0xE                            // 光标位置 - 高位
 #define CRT_CURSOR_L 0xF                            // 光标位置 - 低位
 
+/**
+ * 根据 CRT 芯片的规格和文档：
+ *      往 0x3D4 发送 0xC 表示要操作显示起始位置的高位
+ *      往 0x3D4 发送 0xD 表示要操作显示起始位置的低位
+ */
+#define CRT_START_ADDR_H 0xC                        // 显示内存起始位置 - 高位
+#define CRT_START_ADDR_L 0xD                        // 显示内存起始位置 - 低位
+
 #define MEM_BASE 0xB8000                            // 显卡内存起始位置
 #define MEM_SIZE 0x4000                             // 显卡内存大小
 #define MEM_END (MEM_BASE + MEM_SIZE)               // 显卡内存结束位置
@@ -39,6 +47,21 @@ static void set_cursor()
 }
 
 /**
+ * 设置显示器显示的起始位置
+ *      因为0xb8000到0xc000都是显存的位置，怎么让显示器从固定的内存位置显示开始显示呢？
+ *      这个函数完成此功能
+ */
+static void set_screen()
+{
+    out_byte(CRT_ADDR_REG, CRT_START_ADDR_H);                       // 要操作显示起始位置的高位
+    out_byte(CRT_DATA_REG, ((screen - MEM_BASE) >> 9) & 0xff);      // 往要显示起始位置的高位写数据
+    // 当前位置 - 0xb8000（首地址）右移 9 位
+    // 右移 9 位是因为低位占8位，而屏幕上的每一个字符都占2位，即右移8位再除以2，即右移9位
+    out_byte(CRT_ADDR_REG, CRT_START_ADDR_L);                       // 要操作显示起始位置的低位
+    out_byte(CRT_DATA_REG, ((screen - MEM_BASE) >> 1) & 0xff);      // 往要显示起始位置的低位写数据
+}
+
+/**
  * 清屏，实际上是往0xb8000的内存位置写空格，写满就是清屏
  */
 void console_clear()
@@ -47,7 +70,8 @@ void console_clear()
     pos = MEM_BASE;
     x = y = 0;
 
-    set_cursor();
+    set_cursor();                   // 设置光标位置
+    set_screen();
 
     u16 *ptr = (u16 *)MEM_BASE;
     while (ptr < MEM_END)
