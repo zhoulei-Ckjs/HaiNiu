@@ -7,9 +7,7 @@ void kernel_main(void)
 
     char* s = "HaiNiu";
 
-    for (int i = 0; i < 10; ++i) {
-        printk("name: %s, age:%d\n", s, i);
-    }
+    printk("name: %s, age:%d\n", 'a', 10);
 
     while (true);
 }

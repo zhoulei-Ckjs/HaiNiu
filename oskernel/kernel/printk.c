@@ -1,6 +1,4 @@
-//#include "../include/linux/kernel.h"
-
-#include "../include/stdarg.h"
+#include "../include/linux/kernel.h"
 
 static char buf[1024];
 int printk(const char * fmt, ...)
