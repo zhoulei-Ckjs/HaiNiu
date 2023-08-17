@@ -5,9 +5,7 @@ void kernel_main(void)
 {
     console_init();
 
-    char* s = "HaiNiu";
-
-    printk("name: %s, age:%d\n", s, 6);
+    printk("char is : %c", 'H');                // 打印一个字符
 
     while (true);
 }
