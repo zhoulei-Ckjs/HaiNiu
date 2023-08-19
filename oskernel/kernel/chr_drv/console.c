@@ -87,14 +87,20 @@ void console_init(void)
 
 void console_write(char *buf, u32 count)
 {
-    char *p = buf;
-    char* video = (char*)MEM_BASE + 80 * 2 * 2;       // 显示在第三行，0xb8000是显存和内存的映射位置，每行80字符，每个字符2字节
-    while(count--)
+    char ch;
+    char *ptr = (char *)pos;                    // 指向当前位置
+    while (count--)
     {
-        *video = *p;
-        ++video;
-        *video = 12;
-        ++video;
-        p++;
+        ch = *buf++;
+        switch (ch)
+        {
+            default:
+                *ptr = ch;                      // 写一个字符
+                ptr++;                          // 指针后移
+                *ptr = 0x07;                    // 黑底白字
+                ptr++;
+                pos += 2;                       // 当前位置向后移动
+        }
     }
+    set_cursor();                               //  将光标设定为当前 pos 所指向的位置
 }
