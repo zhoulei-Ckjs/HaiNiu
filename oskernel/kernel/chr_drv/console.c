@@ -111,11 +111,18 @@ void console_write(char *buf, u32 count)
                 command_lf();                   // 换行
                 break;
             default:
+                if (x >= WIDTH)                 // 横坐标超过80，该换行了
+                {
+                    x -= WIDTH;
+                    pos -= ROW_SIZE;
+                    command_lf();
+                }
                 *ptr = ch;                      // 写一个字符
                 ptr++;                          // 指针后移
                 *ptr = 0x07;                    // 黑底白字
                 ptr++;
                 pos += 2;                       // 当前位置向后移动
+                x++;
         }
     }
     set_cursor();                               //  将光标设定为当前 pos 所指向的位置
