@@ -15,6 +15,9 @@ void kernel_main(void)
     // 测试超过字符自动换行
     p = "123456789 123456789 123456789 123456789 123456789 123456789 123456789 123456789 1234567890";
     console_write(p, 90);
+    // 让换行 '\n' 能够定位到行首测试
+    p = "\nabcdefghijklmnopqrstuvwxyz\nABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    console_write(p, 54);
 
     /* 测试printk */
 //    printk("char is : %c", 'H');                // 打印一个字符

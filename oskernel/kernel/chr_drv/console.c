@@ -98,6 +98,15 @@ static void command_lf()
     pos += ROW_SIZE;
 }
 
+/**
+ * 让程序定位到行首
+ */
+static void command_cr()
+{
+    pos -= (x << 1);
+    x = 0;
+}
+
 void console_write(char *buf, u32 count)
 {
     char ch;
@@ -109,6 +118,8 @@ void console_write(char *buf, u32 count)
         {
             case ASCII_LF:
                 command_lf();                   // 换行
+                command_cr();                   // 跳到行首
+                ptr = (char *)pos;              // 更改指针位置
                 break;
             default:
                 if (x >= WIDTH)                 // 横坐标超过80，该换行了
