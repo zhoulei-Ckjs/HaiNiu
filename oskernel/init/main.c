@@ -18,9 +18,16 @@ void kernel_main(void)
     // 让换行 '\n' 能够定位到行首测试
     p = "\nabcdefghijklmnopqrstuvwxyz\nABCDEFGHIJKLMNOPQRSTUVWXYZ";
     console_write(p, 54);
+    // 测试 '\0' 作为字符串结尾
+    p = "\n123456789\0""123";                 // 编译器识别为 123456789 \0 123
+    console_write(p, 14);
+    // 这里会有一个bug，就是遇到\0不退出，但这并不一定认为是bug，暂且看printk有没有这个bug，因为printk是对console_write的封装
 
     /* 测试printk */
 //    printk("char is : %c", 'H');                // 打印一个字符
+// 测试 '\0' 作为字符串结尾
+//    p = "\n123456789\0""123";                 // 编译器识别为 123456789 \0 123
+//    printk("%s", p);
 
     while (true);
 }

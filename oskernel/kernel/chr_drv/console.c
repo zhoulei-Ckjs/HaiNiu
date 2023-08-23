@@ -31,7 +31,8 @@
 #define WIDTH 80                                    // 屏幕文本列数，每行显示80个字节
 #define ROW_SIZE (WIDTH * 2)                        // 每行字节数，每行显示80个字节（但是每个字节后面都有一个表示颜色的字节），所以就是160字节
 
-#define ASCII_LF 0x0A  // LINE FEED 换行符 \n
+#define ASCII_NUL 0x00                              // 结尾符 \0
+#define ASCII_LF 0x0A                               // LINE FEED 换行符 \n
 
 static uint screen;                                 // 当前显示器开始的内存位置
 static uint pos;                                    // 记录当前光标的内存位置
@@ -116,6 +117,9 @@ void console_write(char *buf, u32 count)
         ch = *buf++;
         switch (ch)
         {
+            /* '\0'的处理 */
+            case ASCII_NUL:
+                break;
             case ASCII_LF:
                 command_lf();                   // 换行
                 command_cr();                   // 跳到行首
