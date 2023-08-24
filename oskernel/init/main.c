@@ -22,6 +22,9 @@ void kernel_main(void)
     p = "\n123456789\0""123";                 // 编译器识别为 123456789 \0 123
     console_write(p, 14);
     // 这里会有一个bug，就是遇到\0不退出，但这并不一定认为是bug，暂且看printk有没有这个bug，因为printk是对console_write的封装
+    // 测试 '\a' '\t' '\v' , 默认不处理
+    p = "\n1234\a56\t78\v9123";
+    console_write(p, 16);
 
     /* 测试printk */
 //    printk("char is : %c", 'H');                // 打印一个字符

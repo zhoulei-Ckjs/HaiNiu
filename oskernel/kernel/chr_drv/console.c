@@ -32,7 +32,10 @@
 #define ROW_SIZE (WIDTH * 2)                        // 每行字节数，每行显示80个字节（但是每个字节后面都有一个表示颜色的字节），所以就是160字节
 
 #define ASCII_NUL 0x00                              // 结尾符 \0
+#define ASCII_BEL 0x07                              // \a，警报提示音
+#define ASCII_HT 0x09                               // \t，tab键
 #define ASCII_LF 0x0A                               // LINE FEED 换行符 \n
+#define ASCII_VT 0x0B                               // \v 垂直制表位
 
 static uint screen;                                 // 当前显示器开始的内存位置
 static uint pos;                                    // 记录当前光标的内存位置
@@ -117,13 +120,22 @@ void console_write(char *buf, u32 count)
         ch = *buf++;
         switch (ch)
         {
-            /* '\0'的处理 */
+            /** '\0'的处理 不打印 **/
             case ASCII_NUL:
+                break;
+                /** '\a'警报提示音，暂不处理 **/
+            case ASCII_BEL:
+                break;
+                /** '\t' tab键，暂不处理 **/
+            case ASCII_HT:
                 break;
             case ASCII_LF:
                 command_lf();                   // 换行
                 command_cr();                   // 跳到行首
                 ptr = (char *)pos;              // 更改指针位置
+                break;
+                /** '\v' 垂直制表位 暂不处理 **/
+            case ASCII_VT:
                 break;
             default:
                 if (x >= WIDTH)                 // 横坐标超过80，该换行了
