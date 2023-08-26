@@ -25,6 +25,9 @@ void kernel_main(void)
     // 测试 '\a' '\t' '\v' , 默认不处理
     p = "\n1234\a56\t78\v9123";
     console_write(p, 16);
+    // '\b' 退格符的测试
+    p = "\n123a\b456789\n";
+    console_write(p, 13);
 
     /* 测试printk */
 //    printk("char is : %c", 'H');                // 打印一个字符

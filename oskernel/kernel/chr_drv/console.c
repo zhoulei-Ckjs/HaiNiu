@@ -33,6 +33,7 @@
 
 #define ASCII_NUL 0x00                              // 结尾符 \0
 #define ASCII_BEL 0x07                              // \a，警报提示音
+#define ASCII_BS 0x08                               // \b，退格符backspace
 #define ASCII_HT 0x09                               // \t，tab键
 #define ASCII_LF 0x0A                               // LINE FEED 换行符 \n
 #define ASCII_VT 0x0B                               // \v 垂直制表位
@@ -111,6 +112,19 @@ static void command_cr()
     x = 0;
 }
 
+/**
+ * '\b' 退格符 backspace 的处理
+ */
+static void command_bs()
+{
+    if (x > 0)
+    {
+        x--;
+        pos -= 2;
+        *(u16 *)pos = 0x0720;
+    }
+}
+
 void console_write(char *buf, u32 count)
 {
     char ch;
@@ -126,9 +140,15 @@ void console_write(char *buf, u32 count)
                 /** '\a'警报提示音，暂不处理 **/
             case ASCII_BEL:
                 break;
+                /** '\b'退格符，backspace **/
+            case ASCII_BS:
+                command_bs();
+                ptr = (char *)pos;              // 更改指针位置
+                break;
                 /** '\t' tab键，暂不处理 **/
             case ASCII_HT:
                 break;
+                /** '\n' 的处理 **/
             case ASCII_LF:
                 command_lf();                   // 换行
                 command_cr();                   // 跳到行首
