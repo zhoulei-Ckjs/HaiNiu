@@ -33,6 +33,9 @@ void kernel_main(void)
     console_write(p, 9);
     p = "\rabcdefghi\n";
     console_write(p, 11);
+    // delete键测试
+    char p1[10] = {'1', '2', '3','4', '5', 0x7f, '6', '7', '8', '9' };
+    console_write(p1, 10);
 
     /* 测试printk */
 //    printk("char is : %c", 'H');                // 打印一个字符

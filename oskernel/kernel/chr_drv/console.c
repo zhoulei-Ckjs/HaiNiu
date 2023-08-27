@@ -38,6 +38,7 @@
 #define ASCII_LF 0x0A                               // LINE FEED 换行符 \n
 #define ASCII_VT 0x0B                               // \v 垂直制表位
 #define ASCII_CR 0x0D                               // \r 回车符
+#define ASCII_DEL 0x7F                              // delete 键，这个键 ascii 也是 a.out 的起始字符
 
 static uint screen;                                 // 当前显示器开始的内存位置
 static uint pos;                                    // 记录当前光标的内存位置
@@ -126,6 +127,14 @@ static void command_bs()
     }
 }
 
+/**
+ * delete 键，没有特殊的转义字符，ascii 码为 0x7F
+ */
+static void command_del()
+{
+    *(u16 *)pos = 0x0720;                       // 将当前位置字符置空，有待完善
+}
+
 void console_write(char *buf, u32 count)
 {
     char ch;
@@ -162,6 +171,10 @@ void console_write(char *buf, u32 count)
             case ASCII_CR:
                 command_cr();
                 ptr = (char *)pos;              // 更改指针位置
+                break;
+                /** 'del' 键  ascii = 0x7f **/
+            case ASCII_DEL:
+                command_del();
                 break;
             default:
                 if (x >= WIDTH)                 // 横坐标超过80，该换行了
