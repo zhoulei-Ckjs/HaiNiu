@@ -28,6 +28,11 @@ void kernel_main(void)
     // '\b' 退格符的测试
     p = "\n123a\b456789\n";
     console_write(p, 13);
+    // '\r' 回车符测试
+    p = "123456789";
+    console_write(p, 9);
+    p = "\rabcdefghi\n";
+    console_write(p, 11);
 
     /* 测试printk */
 //    printk("char is : %c", 'H');                // 打印一个字符

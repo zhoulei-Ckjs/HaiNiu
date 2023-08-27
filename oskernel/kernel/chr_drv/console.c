@@ -37,6 +37,7 @@
 #define ASCII_HT 0x09                               // \t，tab键
 #define ASCII_LF 0x0A                               // LINE FEED 换行符 \n
 #define ASCII_VT 0x0B                               // \v 垂直制表位
+#define ASCII_CR 0x0D                               // \r 回车符
 
 static uint screen;                                 // 当前显示器开始的内存位置
 static uint pos;                                    // 记录当前光标的内存位置
@@ -156,6 +157,11 @@ void console_write(char *buf, u32 count)
                 break;
                 /** '\v' 垂直制表位 暂不处理 **/
             case ASCII_VT:
+                break;
+                /** '\r' 回车符的处理 **/
+            case ASCII_CR:
+                command_cr();
+                ptr = (char *)pos;              // 更改指针位置
                 break;
             default:
                 if (x >= WIDTH)                 // 横坐标超过80，该换行了
