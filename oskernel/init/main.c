@@ -36,6 +36,11 @@ void kernel_main(void)
     // delete键测试
     char p1[10] = {'1', '2', '3','4', '5', 0x7f, '6', '7', '8', '9' };
     console_write(p1, 10);
+    // 测试滚屏功能
+    p = "\na\nb\nc\nd\ne\nf\ng\nh\ni\nj\nk\nl\nm\nn\no\np\nq\nr\ns\nt\nu\nv\nw\nx\ny\nz\n"
+        "jfdlkslaljfkldjsalkfjdoisajflkjdsalkjfdklsjaklfjlsdkajfkljdsalkjfkldsjalkjfldksa"
+        "jfkljhdslklaljflksdjakfjdskla\n";
+    console_write(p, 163);
 
     /* 测试printk */
 //    printk("char is : %c", 'H');                // 打印一个字符

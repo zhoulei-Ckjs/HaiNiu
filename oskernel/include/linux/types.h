@@ -3,6 +3,8 @@
 
 #define true 1
 
+typedef unsigned int size_t;
+
 typedef unsigned int uint;
 
 typedef unsigned short u16;

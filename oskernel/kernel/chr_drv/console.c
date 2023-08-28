@@ -29,7 +29,9 @@
 #define MEM_SIZE 0x4000                             // 显卡内存大小
 #define MEM_END (MEM_BASE + MEM_SIZE)               // 显卡内存结束位置
 #define WIDTH 80                                    // 屏幕文本列数，每行显示80个字节
+#define HEIGHT 25                                   // 屏幕文本行数
 #define ROW_SIZE (WIDTH * 2)                        // 每行字节数，每行显示80个字节（但是每个字节后面都有一个表示颜色的字节），所以就是160字节
+#define SCR_SIZE (ROW_SIZE * HEIGHT)                // 屏幕字节数
 
 #define ASCII_NUL 0x00                              // 结尾符 \0
 #define ASCII_BEL 0x07                              // \a，警报提示音
@@ -67,9 +69,10 @@ static void set_screen()
     out_byte(CRT_ADDR_REG, CRT_START_ADDR_H);                       // 要操作显示起始位置的高位
     out_byte(CRT_DATA_REG, ((screen - MEM_BASE) >> 9) & 0xff);      // 往要显示起始位置的高位写数据
     // 当前位置 - 0xb8000（首地址）右移 9 位
-    // 右移 9 位是因为低位占8位，而屏幕上的每一个字符都占2位，即右移8位再除以2，即右移9位
+    // 右移 9 位是因为低位占8位，而屏幕上的每一个字符都占2位字节，控制器是以字符为单位的，即右移8位再右移 1 位，即右移9位
     out_byte(CRT_ADDR_REG, CRT_START_ADDR_L);                       // 要操作显示起始位置的低位
     out_byte(CRT_DATA_REG, ((screen - MEM_BASE) >> 1) & 0xff);      // 往要显示起始位置的低位写数据
+    // 屏幕上的没一个字符占2个字节，控制器是以字符为单位的，所有我们要右移 1 位
 }
 
 /**
@@ -97,12 +100,40 @@ void console_init(void)
 }
 
 /**
+ * 向上滚屏
+ */
+static void scroll_up()
+{
+    if (screen + SCR_SIZE + ROW_SIZE < MEM_END)     // 没有达到全部映射的内存
+    {
+        // 对下一行进行清空操作，因为整个映射的显存是循环使用的，因此下一行可能被写入了数据，所以要清空
+        u32 *ptr = (u32 *)(screen + SCR_SIZE);
+        for (size_t i = 0; i < WIDTH; i++)
+        {
+            *ptr++ = 0x0720;
+        }
+        screen += ROW_SIZE;                         // 显示的起始位置 + 一行
+        pos += ROW_SIZE;
+    }
+    else                                            // 已经达到映射的内存了，那么可能要循环到开始再显示了
+    {
+
+    }
+    set_screen();
+}
+
+/**
  * 换行的命令处理，即 ASCII 为 0A，即'\n'的处理
  */
 static void command_lf()
 {
-    y++;
-    pos += ROW_SIZE;
+    if(y + 1 < HEIGHT)
+    {
+        y++;
+        pos += ROW_SIZE;
+        return;
+    }
+    scroll_up();
 }
 
 /**
