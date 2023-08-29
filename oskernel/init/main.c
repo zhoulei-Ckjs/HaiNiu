@@ -1,5 +1,6 @@
 #include "../include/linux/tty.h"
 #include "../include/linux/kernel.h"
+#include "../include/string.h"
 
 void kernel_main(void)
 {
@@ -41,6 +42,11 @@ void kernel_main(void)
         "jfdlkslaljfkldjsalkfjdoisajflkjdsalkjfdklsjaklfjlsdkajfkljdsalkjfkldsjalkjfldksa"
         "jfkljhdslklaljflksdjakfjdskla\n";
     console_write(p, 163);
+
+    // 测试 memcpy 函数
+    p = "abcde\n";
+    memcpy(p1, p, 6);
+    console_write(p1, 6);
 
     /* 测试printk */
 //    printk("char is : %c", 'H');                // 打印一个字符
