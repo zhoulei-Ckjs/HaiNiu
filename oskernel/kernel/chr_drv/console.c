@@ -39,6 +39,7 @@
 #define ASCII_HT 0x09                               // \t，tab键
 #define ASCII_LF 0x0A                               // LINE FEED 换行符 \n
 #define ASCII_VT 0x0B                               // \v 垂直制表位
+#define ASCII_FF 0x0C                               // \f 滚动到下一行，并不定位到行首
 #define ASCII_CR 0x0D                               // \r 回车符
 #define ASCII_DEL 0x7F                              // delete 键，这个键 ascii 也是 a.out 的起始字符
 
@@ -197,6 +198,11 @@ void console_write(char *buf, u32 count)
                 break;
                 /** '\v' 垂直制表位 暂不处理 **/
             case ASCII_VT:
+                break;
+                /** '\f' 滚动一行 **/
+            case ASCII_FF:
+                command_lf();
+                ptr = (char *)pos;              // 更改指针位置
                 break;
                 /** '\r' 回车符的处理 **/
             case ASCII_CR:

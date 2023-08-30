@@ -47,6 +47,9 @@ void kernel_main(void)
     p = "abcde\n";
     memcpy(p1, p, 6);
     console_write(p1, 6);
+    // 测试 '\f' 滚动一行
+    p = "12345\f67890\f";
+    console_write(p, 12);
 
     /* 测试printk */
 //    printk("char is : %c", 'H');                // 打印一个字符
