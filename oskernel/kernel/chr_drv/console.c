@@ -118,7 +118,9 @@ static void scroll_up()
     }
     else                                            // 已经达到映射的内存了，那么可能要循环到开始再显示了
     {
-
+        memcpy(MEM_BASE, screen, SCR_SIZE);
+        pos -= (screen - MEM_BASE);
+        screen = MEM_BASE;
     }
     set_screen();
 }
