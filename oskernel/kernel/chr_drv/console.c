@@ -172,7 +172,7 @@ static void command_del()
 void console_write(char *buf, u32 count)
 {
     char ch;
-    char *ptr = (char *)pos;                    // 指向当前位置
+    char *ptr = NULL;
     while (count--)
     {
         ch = *buf++;
@@ -187,7 +187,6 @@ void console_write(char *buf, u32 count)
                 /** '\b'退格符，backspace **/
             case ASCII_BS:
                 command_bs();
-                ptr = (char *)pos;              // 更改指针位置
                 break;
                 /** '\t' tab键，暂不处理 **/
             case ASCII_HT:
@@ -196,7 +195,6 @@ void console_write(char *buf, u32 count)
             case ASCII_LF:
                 command_lf();                   // 换行
                 command_cr();                   // 跳到行首
-                ptr = (char *)pos;              // 更改指针位置
                 break;
                 /** '\v' 垂直制表位 暂不处理 **/
             case ASCII_VT:
@@ -204,12 +202,10 @@ void console_write(char *buf, u32 count)
                 /** '\f' 滚动一行 **/
             case ASCII_FF:
                 command_lf();
-                ptr = (char *)pos;              // 更改指针位置
                 break;
                 /** '\r' 回车符的处理 **/
             case ASCII_CR:
                 command_cr();
-                ptr = (char *)pos;              // 更改指针位置
                 break;
                 /** 'del' 键  ascii = 0x7f **/
             case ASCII_DEL:
@@ -222,10 +218,9 @@ void console_write(char *buf, u32 count)
                     pos -= ROW_SIZE;
                     command_lf();
                 }
+                ptr = (char *)pos;              // 更改指针位置
                 *ptr = ch;                      // 写一个字符
-                ptr++;                          // 指针后移
-                *ptr = 0x07;                    // 黑底白字
-                ptr++;
+                *(ptr + 1) = 0x07;              // 黑底白字
                 pos += 2;                       // 当前位置向后移动
                 x++;
         }

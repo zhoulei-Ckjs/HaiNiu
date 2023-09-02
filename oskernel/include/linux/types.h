@@ -1,6 +1,8 @@
 #ifndef HAINIU_TYPES_H
 #define HAINIU_TYPES_H
 
+#define NULL ((void *)0) // 空指针
+
 #define true 1
 
 typedef unsigned int size_t;
