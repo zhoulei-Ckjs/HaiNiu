@@ -55,10 +55,10 @@ void kernel_main(void)
     size_t  size = strlen(p);
 
     /* 测试printk */
-//    printk("char is : %c", 'H');                // 打印一个字符
-// 测试 '\0' 作为字符串结尾
-//    p = "\n123456789\0""123";                 // 编译器识别为 123456789 \0 123
-//    printk("%s", p);
+    printk("char is : %c", 'H');                // 打印一个字符
+    // 测试 '\0' 作为字符串结尾
+    p = "\n123456789\0""123";                 // 编译器识别为 123456789 \0 123
+    printk("%s", p);
 
     while (true);
 }
