@@ -51,6 +51,9 @@ void kernel_main(void)
     p = "12345\f67890\f";
     console_write(p, 12);
 
+    // 测试 strlen
+    size_t  size = strlen(p);
+
     /* 测试printk */
 //    printk("char is : %c", 'H');                // 打印一个字符
 // 测试 '\0' 作为字符串结尾

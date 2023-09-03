@@ -1,7 +1,8 @@
 #ifndef HAINIU_TYPES_H
 #define HAINIU_TYPES_H
 
-#define NULL ((void *)0) // 空指针
+#define NULL ((void *)0)                // 空指针
+#define EOS '\0'                        // 字符串结尾
 
 #define true 1
 

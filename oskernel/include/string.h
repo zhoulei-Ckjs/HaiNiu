@@ -4,6 +4,13 @@
 #include "../include/linux/types.h"
 
 /**
+ * 计算字符串的长度，不算 '\0'
+ * @param str 指针指向字符串
+ * @return 字符串长度，不计算 '\0'
+ */
+size_t strlen(const char* str);
+
+/**
  * 字符串拷贝函数
  * @param dest 目标地址
  * @param src  源地址
