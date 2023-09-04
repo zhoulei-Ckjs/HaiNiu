@@ -59,6 +59,9 @@ void kernel_main(void)
     // 测试 '\0' 作为字符串结尾
     p = "\n123456789\0""123";                 // 编译器识别为 123456789 \0 123
     printk("%s", p);
+    // 测试 '%d'
+    p = "\nhainiu";
+    printk("%s,%d", p, 10);
 
     while (true);
 }
