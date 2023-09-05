@@ -62,6 +62,8 @@ void kernel_main(void)
     // 测试 '%d'
     p = "\nhainiu";
     printk("%s,%d", p, 10);
+    // 测试 '%x'
+    printk("%s,%d,%X", p, 10, 16);
 
     while (true);
 }
