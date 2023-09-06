@@ -18,7 +18,7 @@ __res; })
  */
 static char * number(char * str, int num, int base)
 {
-    const char *    digits = "0123456789";
+    const char *    digits = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";    // 更多进制使用，不局限于 16 进制
     int             i;
     char            tmp[36];
     i = 0;

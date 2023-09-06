@@ -64,6 +64,8 @@ void kernel_main(void)
     printk("%s,%d", p, 10);
     // 测试 '%x'
     printk("%s,%d,%X", p, 10, 16);
+    printk("%s,%d,%X", p, 10, 255);
+
 
     while (true);
 }
