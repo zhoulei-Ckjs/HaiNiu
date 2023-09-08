@@ -1,6 +1,7 @@
 #include "../include/linux/kernel.h"
 #include "../include/string.h"
 
+#define SIGN	2		        // 有符号
 #define SMALL	64		        // 使用 'abcdef' 代替 'ABCDEF'
 
 /**
@@ -24,10 +25,22 @@ static char * number(char * str, int num, int base, int flags)
     const char *    digits = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";    // 更多进制使用，不局限于 16 进制
     int             i;
     char            tmp[36];
+    char            sign;
     i = 0;
 
     if (flags & SMALL)
         digits = "0123456789abcdefghijklmnopqrstuvwxyz";                // 将大写换成小写的，这种常量字符串在内存只一份，是只读的
+
+    if (flags & SIGN && num < 0)
+    {
+        sign='-';
+        num = -num;
+    }
+    else
+        sign = 0;
+
+    if (sign)
+        *str++ = sign;
 
     if (num==0)
         tmp[i++]='0';
@@ -80,6 +93,9 @@ int vsprintf(char *buf, const char *fmt, va_list args)
                 break;
             // 整数
             case 'd':
+                flags |= SIGN;
+            // unsigned
+            case 'u':
                 str = number(str, va_arg(args, unsigned long), 10, flags);
                 break;
         }
