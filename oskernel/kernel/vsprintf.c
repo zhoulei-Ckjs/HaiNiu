@@ -1,6 +1,8 @@
 #include "../include/linux/kernel.h"
 #include "../include/string.h"
 
+#define SMALL	64		        // 使用 'abcdef' 代替 'ABCDEF'
+
 /**
  * 内联汇编，做除法运算
  */
@@ -14,14 +16,19 @@ __res; })
  * @param str 转换后数据所保存的位置
  * @param num 需要转换的数据
  * @param base 进制数
+ * @param flag 一些标记，如是大写 16 进制还是小写 16 进制
  * @return 返回 原始传递的 buffer
  */
-static char * number(char * str, int num, int base)
+static char * number(char * str, int num, int base, int flags)
 {
     const char *    digits = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";    // 更多进制使用，不局限于 16 进制
     int             i;
     char            tmp[36];
     i = 0;
+
+    if (flags & SMALL)
+        digits = "0123456789abcdefghijklmnopqrstuvwxyz";                // 将大写换成小写的，这种常量字符串在内存只一份，是只读的
+
     if (num==0)
         tmp[i++]='0';
     else while (num != 0)
@@ -38,6 +45,7 @@ int vsprintf(char *buf, const char *fmt, va_list args)
     char *  s;
     int     len;
     int     i;
+    int     flags;                                      // 做各种标记用
 
     for (str = buf ; *fmt ; ++fmt)
     {
@@ -46,6 +54,8 @@ int vsprintf(char *buf, const char *fmt, va_list args)
             *str++ = *fmt;
             continue;
         }
+
+        flags = 0;
 
         ++fmt;                                          // 跳过 '%'
 
@@ -63,12 +73,14 @@ int vsprintf(char *buf, const char *fmt, va_list args)
                     *str++ = *s++;
                 break;
             // 十六进制
+            case 'x':
+                flags |= SMALL;                             // 小写 16 进制
             case 'X':
-                str = number(str, va_arg(args, unsigned long), 16);
+                str = number(str, va_arg(args, unsigned long), 16, flags);
                 break;
             // 整数
             case 'd':
-                str = number(str, va_arg(args, unsigned long), 10);
+                str = number(str, va_arg(args, unsigned long), 10, flags);
                 break;
         }
     }
