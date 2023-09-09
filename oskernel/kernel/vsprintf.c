@@ -93,6 +93,7 @@ int vsprintf(char *buf, const char *fmt, va_list args)
                 break;
             // 整数
             case 'd':
+            case 'i':
                 flags |= SIGN;
             // unsigned
             case 'u':
