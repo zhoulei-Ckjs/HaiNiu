@@ -85,6 +85,10 @@ int vsprintf(char *buf, const char *fmt, va_list args)
                 for (i = 0; i < len; ++i)
                     *str++ = *s++;
                 break;
+            // 八进制
+            case 'o':
+                str = number(str, va_arg(args, unsigned long), 8, flags);
+                break;
             // 十六进制
             case 'x':
                 flags |= SMALL;                             // 小写 16 进制

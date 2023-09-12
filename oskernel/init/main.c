@@ -68,6 +68,8 @@ void kernel_main(void)
     // 测试 '%x'
     printk("%s,%d,%X,%x", p, 10, 255, 254);
     printk("%s,%d,%X,%x,%u", p, 0xffffffff, 255, 254,0xffffffff);
+    // 测试 '%o' 八进制
+    printk("\n%o\n", 16);
 
     while (true);
 }
