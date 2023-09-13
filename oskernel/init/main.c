@@ -70,6 +70,8 @@ void kernel_main(void)
     printk("%s,%d,%X,%x,%u", p, 0xffffffff, 255, 254,0xffffffff);
     // 测试 '%o' 八进制
     printk("\n%o\n", 16);
+    // 测试 '%p' 以十六进制的形式输出指针类型的内容
+    printk("%p\n", p);
 
     while (true);
 }

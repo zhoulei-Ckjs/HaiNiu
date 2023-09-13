@@ -89,6 +89,10 @@ int vsprintf(char *buf, const char *fmt, va_list args)
             case 'o':
                 str = number(str, va_arg(args, unsigned long), 8, flags);
                 break;
+            // 以十六进制的形式输出指针类型的内容
+            case 'p':
+                str = number(str,  (unsigned long) va_arg(args, void *), 16, flags);
+                break;
             // 十六进制
             case 'x':
                 flags |= SMALL;                             // 小写 16 进制
