@@ -59,6 +59,7 @@ int vsprintf(char *buf, const char *fmt, va_list args)
     int     len;
     int     i;
     int     flags;                                      // 做各种标记用
+    int *   ip;                                         // int 型指针
 
     for (str = buf ; *fmt ; ++fmt)
     {
@@ -106,6 +107,11 @@ int vsprintf(char *buf, const char *fmt, va_list args)
             // unsigned
             case 'u':
                 str = number(str, va_arg(args, unsigned long), 10, flags);
+                break;
+            // 打印已经输出的字符数量
+            case 'n':
+                ip = va_arg(args, int *);
+                *ip = (str - buf);
                 break;
         }
     }

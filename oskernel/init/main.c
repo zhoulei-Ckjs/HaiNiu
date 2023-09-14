@@ -72,6 +72,11 @@ void kernel_main(void)
     printk("\n%o\n", 16);
     // 测试 '%p' 以十六进制的形式输出指针类型的内容
     printk("%p\n", p);
+    // 测试 '%n' , 统计输出了多少字符
+    int count = 0;
+    p = "123456";
+    printk("%s %n\n", p, &count);
+    printk("%d\n", count);
 
     while (true);
 }
