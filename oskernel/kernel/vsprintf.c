@@ -113,6 +113,10 @@ int vsprintf(char *buf, const char *fmt, va_list args)
                 ip = va_arg(args, int *);
                 *ip = (str - buf);
                 break;
+            // '%' 后面不是标准操作时的处理，如输出 "%a" 等
+            default:
+                *str++ = '%';
+                *str++ = *fmt;
         }
     }
     *str = '\0';

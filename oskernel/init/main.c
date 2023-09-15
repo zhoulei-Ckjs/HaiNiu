@@ -77,6 +77,8 @@ void kernel_main(void)
     p = "123456";
     printk("%s %n\n", p, &count);
     printk("%d\n", count);
+    // 测试非标准输出
+    printk("%a");
 
     while (true);
 }
