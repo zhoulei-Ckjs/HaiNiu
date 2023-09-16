@@ -115,8 +115,17 @@ int vsprintf(char *buf, const char *fmt, va_list args)
                 break;
             // '%' 后面不是标准操作时的处理，如输出 "%a" 等
             default:
-                *str++ = '%';
-                *str++ = *fmt;
+                if (*fmt != '%')
+                    *str++ = '%';
+                if (*fmt)
+                {
+                    *str++ = *fmt;
+                    if(*fmt == '%')
+                        --fmt;
+                }
+                else                // 当前字符为 '\0'，--fmt ，default 结束后会进入下一次 for 循环，++fmt
+                    --fmt;          // 先--，for循环又++，for 循环中间的判断 *fmt，故而结束 for 循环，不会输出 '\0' 之后的内容
+                break;
         }
     }
     *str = '\0';

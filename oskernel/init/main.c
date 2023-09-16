@@ -78,7 +78,13 @@ void kernel_main(void)
     printk("%s %n\n", p, &count);
     printk("%d\n", count);
     // 测试非标准输出
-    printk("%a");
+    printk("%a\n");
+    printk("%a%%d%t\n",6);
+    printk("%%\n");
+    printk("%%d\n", 3);
+    printk("%%%s\n", p);
+    printk("%\0%s\n", p);
+    printk("%\0%s\n", p);
 
     while (true);
 }
