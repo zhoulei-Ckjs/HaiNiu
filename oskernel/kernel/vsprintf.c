@@ -1,6 +1,11 @@
 #include "../include/linux/kernel.h"
 #include "../include/string.h"
 
+/**
+ * 检测是否是数字
+ */
+#define is_digit(c)	((c) >= '0' && (c) <= '9')
+
 #define SIGN	2		        // 有符号
 #define SMALL	64		        // 使用 'abcdef' 代替 'ABCDEF'
 
@@ -52,6 +57,19 @@ static char * number(char * str, int num, int base, int flags)
     return str;
 }
 
+/**
+ * 略过字符串中数字的部分
+ * @param s 这里传递二级指针，用于改变一级指针指向的位置
+ * @return 字符串中整数值
+ */
+static int skip_atoi(const char **s)
+{
+    int num = 0;
+    while (is_digit(**s))
+        num = num * 10 + *((*s)++) - '0';
+    return num;
+}
+
 int vsprintf(char *buf, const char *fmt, va_list args)
 {
     char *  str;
@@ -60,6 +78,7 @@ int vsprintf(char *buf, const char *fmt, va_list args)
     int     i;
     int     flags;                                      // 做各种标记用
     int *   ip;                                         // int 型指针
+    int     field_width;	                            // 打印宽度
 
     for (str = buf ; *fmt ; ++fmt)
     {
@@ -73,11 +92,17 @@ int vsprintf(char *buf, const char *fmt, va_list args)
 
         ++fmt;                                          // 跳过 '%'
 
+        field_width = -1;                               // 宽度初始化
+        if (is_digit(*fmt))
+            field_width = skip_atoi(&fmt);
+
         switch (*fmt)
         {
             // char 字符
             case 'c':
                 *str++ = (unsigned char) va_arg(args, int); // 输出字符
+                while (--field_width > 0)                   // 用空格补齐宽度
+                    *str++ = ' ';
                 break;
             // 字符串
             case 's':

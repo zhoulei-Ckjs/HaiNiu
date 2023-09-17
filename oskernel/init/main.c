@@ -85,6 +85,9 @@ void kernel_main(void)
     printk("%%%s\n", p);
     printk("%\0%s\n", p);
     printk("%\0%s\n", p);
+    // 测试输出宽度
+    printk("\n------\n");
+    printk("%5ca\n", 64);
 
     while (true);
 }
