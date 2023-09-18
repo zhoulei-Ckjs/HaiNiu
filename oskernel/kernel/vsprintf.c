@@ -25,7 +25,7 @@ __res; })
  * @param flag 一些标记，如是大写 16 进制还是小写 16 进制
  * @return 返回 原始传递的 buffer
  */
-static char * number(char * str, int num, int base, int flags)
+static char * number(char * str, int num, int base, int flags, int size)
 {
     const char *    digits = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";    // 更多进制使用，不局限于 16 进制
     int             i;
@@ -45,15 +45,21 @@ static char * number(char * str, int num, int base, int flags)
         sign = 0;
 
     if (sign)
+    {
+        size--;                                                         // 如果是有符号的负值，则 '-' 占一个位置
         *str++ = sign;
+    }
 
     if (num==0)
         tmp[i++]='0';
     else while (num != 0)
             tmp[i++] = digits[do_div(num, base)];
 
+    size -= i;
     while(i-->0)
         *str++ = tmp[i];
+    while(size-- > 0)
+        *str++ = ' ';
     return str;
 }
 
@@ -110,20 +116,22 @@ int vsprintf(char *buf, const char *fmt, va_list args)
                 len = strlen(s);                        // 遇到 '\0' 结束
                 for (i = 0; i < len; ++i)
                     *str++ = *s++;
+                while (len < field_width--)
+                    *str++ = ' ';
                 break;
             // 八进制
             case 'o':
-                str = number(str, va_arg(args, unsigned long), 8, flags);
+                str = number(str, va_arg(args, unsigned long), 8, flags, field_width);
                 break;
             // 以十六进制的形式输出指针类型的内容
             case 'p':
-                str = number(str,  (unsigned long) va_arg(args, void *), 16, flags);
+                str = number(str,  (unsigned long) va_arg(args, void *), 16, flags, field_width);
                 break;
             // 十六进制
             case 'x':
                 flags |= SMALL;                             // 小写 16 进制
             case 'X':
-                str = number(str, va_arg(args, unsigned long), 16, flags);
+                str = number(str, va_arg(args, unsigned long), 16, flags, field_width);
                 break;
             // 整数
             case 'd':
@@ -131,7 +139,7 @@ int vsprintf(char *buf, const char *fmt, va_list args)
                 flags |= SIGN;
             // unsigned
             case 'u':
-                str = number(str, va_arg(args, unsigned long), 10, flags);
+                str = number(str, va_arg(args, unsigned long), 10, flags, field_width);
                 break;
             // 打印已经输出的字符数量
             case 'n':
