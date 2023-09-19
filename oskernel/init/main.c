@@ -96,6 +96,7 @@ void kernel_main(void)
     printk("%16d~\n", 10);
     printk("%16i~\n", 10);
     printk("%16u~\n", -1);
+    printk("%*u~\n", 32, -1);
 
     while (true);
 }
