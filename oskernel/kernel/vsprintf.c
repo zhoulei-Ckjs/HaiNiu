@@ -45,17 +45,21 @@ static char * number(char * str, int num, int base, int flags, int size)
         sign = 0;
 
     if (sign)
-    {
         size--;                                                         // 如果是有符号的负值，则 '-' 占一个位置
-        *str++ = sign;
-    }
 
     if (num==0)
         tmp[i++]='0';
     else while (num != 0)
             tmp[i++] = digits[do_div(num, base)];
 
-    size -= i;
+    size -= i;                                                          // 右对齐，将要打印的字符去掉，前面打印空格
+
+    while(size-- > 0)                                                   // 前面打印空格
+        *str++ = ' ';
+
+    if (sign)
+        *str++ = sign;
+
     while(i-->0)
         *str++ = tmp[i];
     while(size-- > 0)
