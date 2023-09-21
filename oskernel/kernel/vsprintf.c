@@ -116,12 +116,16 @@ int vsprintf(char *buf, const char *fmt, va_list args)
         {
             // char 字符
             case 'c':
+                while (--field_width > 0)
+                    *str++ = ' ';
                 *str++ = (unsigned char) va_arg(args, int); // 输出字符
                 while (--field_width > 0)                   // 用空格补齐宽度
                     *str++ = ' ';
                 break;
             // 字符串
             case 's':
+                while (len < field_width--)
+                    *str++ = ' ';
                 s = va_arg(args, char *);
                 len = strlen(s);                        // 遇到 '\0' 结束
                 for (i = 0; i < len; ++i)
