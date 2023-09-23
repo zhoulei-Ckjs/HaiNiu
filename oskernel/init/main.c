@@ -97,6 +97,18 @@ void kernel_main(void)
     printk("%16i~\n", 10);
     printk("%16u~\n", -1);
     printk("%*u~\n", 32, -1);
+    // 测试左对齐
+    printk("\n------\n");
+    printk("%-16c~\n", 64);
+    printk("%-16s~\n", p);
+    printk("%-16o~\n", 16);
+    printk("%-16p~\n", p);
+    printk("%-16X~\n", 255);
+    printk("%-16x~\n", 255);
+    printk("%-16d~\n", 10);
+    printk("%-16i~\n", 10);
+    printk("%-16u~\n", -1);
+    printk("%-*u~\n", 32, -1);
 
     while (true);
 }

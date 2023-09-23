@@ -7,6 +7,7 @@
 #define is_digit(c)	((c) >= '0' && (c) <= '9')
 
 #define SIGN	2		        // 有符号
+#define LEFT	16		        // 左对齐
 #define SMALL	64		        // 使用 'abcdef' 代替 'ABCDEF'
 
 /**
@@ -54,8 +55,9 @@ static char * number(char * str, int num, int base, int flags, int size)
 
     size -= i;                                                          // 右对齐，将要打印的字符去掉，前面打印空格
 
-    while(size-- > 0)                                                   // 前面打印空格
-        *str++ = ' ';
+    if (!(flags & LEFT))
+        while(size-- > 0)                                               // 前面打印空格
+            *str++ = ' ';
 
     if (sign)
         *str++ = sign;
@@ -102,6 +104,12 @@ int vsprintf(char *buf, const char *fmt, va_list args)
 
         ++fmt;                                          // 跳过 '%'
 
+        if(*fmt == '-')
+        {
+            flags |= LEFT;
+            fmt++;
+        }
+
         field_width = -1;                               // 宽度初始化
         if (is_digit(*fmt))
             field_width = skip_atoi(&fmt);
@@ -116,16 +124,18 @@ int vsprintf(char *buf, const char *fmt, va_list args)
         {
             // char 字符
             case 'c':
-                while (--field_width > 0)
-                    *str++ = ' ';
+                if (!(flags & LEFT))
+                    while (--field_width > 0)
+                        *str++ = ' ';
                 *str++ = (unsigned char) va_arg(args, int); // 输出字符
                 while (--field_width > 0)                   // 用空格补齐宽度
                     *str++ = ' ';
                 break;
             // 字符串
             case 's':
-                while (len < field_width--)
-                    *str++ = ' ';
+                if (!(flags & LEFT))
+                    while (len < field_width--)
+                        *str++ = ' ';
                 s = va_arg(args, char *);
                 len = strlen(s);                        // 遇到 '\0' 结束
                 for (i = 0; i < len; ++i)
