@@ -110,5 +110,18 @@ void kernel_main(void)
     printk("%-16u~\n", -1);
     printk("%-*u~\n", 32, -1);
 
+    // 测试补零操作
+    printk("\n------\n");
+    printk("%016c~\n", 64);
+    printk("%-016s~\n", p);
+    printk("%016o~\n", 16);
+    printk("%016p~\n", p);
+    printk("%016X~\n", 255);
+    printk("%016x~\n", 255);
+    printk("%016d~\n", 10);
+    printk("%016i~\n", 10);
+    printk("%016u~\n", -1);
+    printk("%0*u~\n", 32, -1);
+
     while (true);
 }

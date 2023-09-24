@@ -6,6 +6,7 @@
  */
 #define is_digit(c)	((c) >= '0' && (c) <= '9')
 
+#define ZEROPAD	1		        // 补零操作
 #define SIGN	2		        // 有符号
 #define LEFT	16		        // 左对齐
 #define SMALL	64		        // 使用 'abcdef' 代替 'ABCDEF'
@@ -29,13 +30,17 @@ __res; })
 static char * number(char * str, int num, int base, int flags, int size)
 {
     const char *    digits = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";    // 更多进制使用，不局限于 16 进制
-    int             i;
+    int             i = 0;
     char            tmp[36];
     char            sign;
-    i = 0;
+    char            c;
 
     if (flags & SMALL)
         digits = "0123456789abcdefghijklmnopqrstuvwxyz";                // 将大写换成小写的，这种常量字符串在内存只一份，是只读的
+    if (flags & LEFT)                                                   // 左对齐的话去掉补零操作
+        flags &= ~ZEROPAD;
+
+    c = (flags & ZEROPAD) ? '0' : ' ' ;
 
     if (flags & SIGN && num < 0)
     {
@@ -56,8 +61,8 @@ static char * number(char * str, int num, int base, int flags, int size)
     size -= i;                                                          // 右对齐，将要打印的字符去掉，前面打印空格
 
     if (!(flags & LEFT))
-        while(size-- > 0)                                               // 前面打印空格
-            *str++ = ' ';
+        while(size-- > 0)                                               // 前面打印空格 或 0
+            *str++ = c;
 
     if (sign)
         *str++ = sign;
@@ -102,12 +107,16 @@ int vsprintf(char *buf, const char *fmt, va_list args)
 
         flags = 0;
 
+repeat:
         ++fmt;                                          // 跳过 '%'
-
-        if(*fmt == '-')
+        switch (*fmt)
         {
-            flags |= LEFT;
-            fmt++;
+            case '-':
+                flags |= LEFT;
+                goto repeat;
+            case '0':
+                flags |= ZEROPAD;
+                goto repeat;
         }
 
         field_width = -1;                               // 宽度初始化
