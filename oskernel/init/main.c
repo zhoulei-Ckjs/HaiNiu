@@ -123,5 +123,9 @@ void kernel_main(void)
     printk("%016u~\n", -1);
     printk("%0*u~\n", 32, -1);
 
+    // 测试带 '+' 的输出
+    printk("\n------\n");
+    printk("%+16d~\n", 64);
+
     while (true);
 }
