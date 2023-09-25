@@ -126,6 +126,9 @@ void kernel_main(void)
     // 测试带 '+' 的输出
     printk("\n------\n");
     printk("%+16d~\n", 64);
+    // 测试 ' '
+    printk("\n------\n");
+    printk("% 16d~\n", 64);
 
     while (true);
 }

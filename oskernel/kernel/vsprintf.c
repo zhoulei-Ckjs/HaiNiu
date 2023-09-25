@@ -9,6 +9,7 @@
 #define ZEROPAD	1		        // 补零操作
 #define SIGN	2		        // 有符号
 #define PLUS	4		        // 输出带 + 的数
+#define SPACE	8		        // 空格
 #define LEFT	16		        // 左对齐
 #define SMALL	64		        // 使用 'abcdef' 代替 'ABCDEF'
 
@@ -49,7 +50,7 @@ static char * number(char * str, int num, int base, int flags, int size)
         num = -num;
     }
     else
-        sign = ((flags & PLUS) ? '+' : 0);
+        sign = (flags & PLUS) ? '+' : ((flags & SPACE) ? ' ' : 0);
 
     if (sign)
         size--;                                                         // 如果是有符号的负值，则 '-' 占一个位置
@@ -120,6 +121,9 @@ repeat:
                 goto repeat;
             case '+':
                 flags |= PLUS;
+                goto repeat;
+            case ' ':
+                flags |= SPACE;
                 goto repeat;
         }
 
