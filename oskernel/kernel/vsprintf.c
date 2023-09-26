@@ -11,6 +11,7 @@
 #define PLUS	4		        // 输出带 + 的数
 #define SPACE	8		        // 空格
 #define LEFT	16		        // 左对齐
+#define SPECIAL	32		        // 输出带有0x前缀的
 #define SMALL	64		        // 使用 'abcdef' 代替 'ABCDEF'
 
 /**
@@ -55,7 +56,13 @@ static char * number(char * str, int num, int base, int flags, int size)
     if (sign)
         size--;                                                         // 如果是有符号的负值，则 '-' 占一个位置
 
-    if (num==0)
+    if (flags & SPECIAL)
+    {
+        if (base == 16)
+            size -= 2;
+    }
+
+    if (num == 0)
         tmp[i++]='0';
     else while (num != 0)
             tmp[i++] = digits[do_div(num, base)];
@@ -68,6 +75,15 @@ static char * number(char * str, int num, int base, int flags, int size)
 
     if (sign)
         *str++ = sign;
+
+    if (flags & SPECIAL)                                                 // 打印 0x 前缀
+    {
+        if (base == 16)
+        {
+            *str++ = '0';
+            *str++ = digits[33];
+        }
+    }
 
     while(i-->0)
         *str++ = tmp[i];
@@ -124,6 +140,9 @@ repeat:
                 goto repeat;
             case ' ':
                 flags |= SPACE;
+                goto repeat;
+            case '#':
+                flags |= SPECIAL;
                 goto repeat;
         }
 
