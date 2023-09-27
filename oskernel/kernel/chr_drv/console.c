@@ -118,9 +118,15 @@ static void scroll_up()
     }
     else                                            // 已经达到映射的内存了，那么可能要循环到开始再显示了
     {
-        memcpy(MEM_BASE, screen, SCR_SIZE);
+        memcpy(MEM_BASE, screen + ROW_SIZE, SCR_SIZE);      // 因为要滚动一行，所以 screen 开始那一行就不要了
         pos -= (screen - MEM_BASE);
+
         screen = MEM_BASE;
+        u32 *ptr = (u32 *)(screen + SCR_SIZE - ROW_SIZE);
+        for (size_t i = 0; i < WIDTH; i++)                  // 最后一行清空
+        {
+            *ptr++ = 0x0720;
+        }
     }
     set_screen();
 }
@@ -181,33 +187,33 @@ void console_write(char *buf, u32 count)
             /** '\0'的处理 不打印 **/
             case ASCII_NUL:
                 break;
-                /** '\a'警报提示音，暂不处理 **/
+            /** '\a'警报提示音，暂不处理 **/
             case ASCII_BEL:
                 break;
-                /** '\b'退格符，backspace **/
+            /** '\b'退格符，backspace **/
             case ASCII_BS:
                 command_bs();
                 break;
-                /** '\t' tab键，暂不处理 **/
+            /** '\t' tab键，暂不处理 **/
             case ASCII_HT:
                 break;
-                /** '\n' 的处理 **/
+            /** '\n' 的处理 **/
             case ASCII_LF:
                 command_lf();                   // 换行
                 command_cr();                   // 跳到行首
                 break;
-                /** '\v' 垂直制表位 暂不处理 **/
+            /** '\v' 垂直制表位 暂不处理 **/
             case ASCII_VT:
                 break;
-                /** '\f' 滚动一行 **/
+            /** '\f' 滚动一行 **/
             case ASCII_FF:
                 command_lf();
                 break;
-                /** '\r' 回车符的处理 **/
+            /** '\r' 回车符的处理 **/
             case ASCII_CR:
                 command_cr();
                 break;
-                /** 'del' 键  ascii = 0x7f **/
+            /** 'del' 键  ascii = 0x7f **/
             case ASCII_DEL:
                 command_del();
                 break;
