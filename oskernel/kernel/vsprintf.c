@@ -60,6 +60,8 @@ static char * number(char * str, int num, int base, int flags, int size)
     {
         if (base == 16)
             size -= 2;
+        else if (base == 8)
+            size--;
     }
 
     if (num == 0)
@@ -78,7 +80,9 @@ static char * number(char * str, int num, int base, int flags, int size)
 
     if (flags & SPECIAL)                                                 // 打印 0x 前缀
     {
-        if (base == 16)
+        if (base == 8)
+            *str++ = '0';
+        else if (base == 16)
         {
             *str++ = '0';
             *str++ = digits[33];

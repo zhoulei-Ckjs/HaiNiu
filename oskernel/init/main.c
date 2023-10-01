@@ -133,7 +133,11 @@ void kernel_main(void)
     // 测试前缀 0x
     printk("\n------0x------\n");
     printk("% #16x~\n", 64);
-    printk("% #16X~\n", 64);                // 这一行没有显示出来，待解决
+    printk("% #16X~\n", 64);
+
+    // 测试前缀 0
+    printk("\n------0------\n");
+    printk("% #16o~\n", 64);
 
     while (true);
 }
