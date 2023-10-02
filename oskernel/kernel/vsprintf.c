@@ -32,6 +32,8 @@ __res; })
  */
 static char * number(char * str, int num, int base, int flags, int size)
 {
+    if (base<2 || base>36)
+        return 0;
     const char *    digits = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";    // 更多进制使用，不局限于 16 进制
     int             i = 0;
     char            tmp[36];
@@ -157,6 +159,11 @@ repeat:
         {
             /* 宽度为下一个参数 */
             field_width = va_arg(args, int);
+            if (field_width < 0)
+            {
+                field_width = -field_width;
+                flags |= LEFT;
+            }
             fmt++;
         }
 

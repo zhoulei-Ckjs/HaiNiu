@@ -139,5 +139,18 @@ void kernel_main(void)
     printk("\n------0------\n");
     printk("% #16o~\n", 64);
 
+    // 测试 %*
+    printk("\n------%*------\n");               // 这里没有打印出*，暂时不管了
+    printk("%*u~\n", 32, -1);
+    printk("%*d~\n", 32, -1);
+    printk("%*o~\n", 32, -1);
+    printk("%*x~\n", 32, -1);
+    printk("%*X~\n", 32, -1);
+    printk("%*u~\n", -32, -1);
+    printk("%*d~\n", -32, -1);
+    printk("%*o~\n", -32, -1);
+    printk("%*x~\n", -32, -1);
+    printk("%*X~\n", -32, -1);
+
     while (true);
 }
