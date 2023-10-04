@@ -152,5 +152,9 @@ void kernel_main(void)
     printk("%*x~\n", -32, -1);
     printk("%*X~\n", -32, -1);
 
+    // 测试 %p，应该输出 000 前缀
+    printk("\n------------\n");
+    printk("%p~\n", p);
+
     while (true);
 }

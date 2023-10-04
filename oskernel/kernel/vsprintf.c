@@ -196,6 +196,11 @@ repeat:
                 break;
             // 以十六进制的形式输出指针类型的内容
             case 'p':
+                if (field_width == -1)
+                {
+                    field_width = 8;
+                    flags |= ZEROPAD;
+                }
                 str = number(str,  (unsigned long) va_arg(args, void *), 16, flags, field_width);
                 break;
             // 十六进制
