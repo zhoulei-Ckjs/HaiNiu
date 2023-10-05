@@ -28,9 +28,11 @@ __res; })
  * @param num 需要转换的数据
  * @param base 进制数
  * @param flag 一些标记，如是大写 16 进制还是小写 16 进制
+ * @param size 数据宽度，要显示多宽
+ * @param precision 精度，小数点后面多少位
  * @return 返回 原始传递的 buffer
  */
-static char * number(char * str, int num, int base, int flags, int size)
+static char * number(char * str, int num, int base, int flags, int size, int precision)
 {
     if (base<2 || base>36)
         return 0;
@@ -70,8 +72,10 @@ static char * number(char * str, int num, int base, int flags, int size)
         tmp[i++]='0';
     else while (num != 0)
             tmp[i++] = digits[do_div(num, base)];
+    if (i > precision)
+        precision = i;
 
-    size -= i;                                                          // 右对齐，将要打印的字符去掉，前面打印空格
+    size -= precision;                                                  // 右对齐，将要打印的字符去掉，前面打印空格
 
     if (!(flags & LEFT))
         while(size-- > 0)                                               // 前面打印空格 或 0
@@ -90,6 +94,9 @@ static char * number(char * str, int num, int base, int flags, int size)
             *str++ = digits[33];
         }
     }
+
+    while(i < precision--)                                              // 如果数据宽度不够精度这么宽，则前面补零
+        *str++ = '0';
 
     while(i-->0)
         *str++ = tmp[i];
@@ -120,6 +127,7 @@ int vsprintf(char *buf, const char *fmt, va_list args)
     int     flags;                                      // 做各种标记用
     int *   ip;                                         // int 型指针
     int     field_width;	                            // 打印宽度
+    int     precision;		                            // 精度
 
     for (str = buf ; *fmt ; ++fmt)
     {
@@ -167,6 +175,22 @@ repeat:
             fmt++;
         }
 
+        precision = -1;                                 // 精度初始化
+        if (*fmt == '.')
+        {
+            ++fmt;
+            if (is_digit(*fmt))
+            {
+                precision = skip_atoi(&fmt);
+            }
+            else if (*fmt == '*')
+            {
+                precision = va_arg(args, int);
+            }
+            if (precision < 0)
+                precision = 0;
+        }
+
         switch (*fmt)
         {
             // char 字符
@@ -192,7 +216,7 @@ repeat:
                 break;
             // 八进制
             case 'o':
-                str = number(str, va_arg(args, unsigned long), 8, flags, field_width);
+                str = number(str, va_arg(args, unsigned long), 8, flags, field_width, precision);
                 break;
             // 以十六进制的形式输出指针类型的内容
             case 'p':
@@ -201,13 +225,13 @@ repeat:
                     field_width = 8;
                     flags |= ZEROPAD;
                 }
-                str = number(str,  (unsigned long) va_arg(args, void *), 16, flags, field_width);
+                str = number(str,  (unsigned long) va_arg(args, void *), 16, flags, field_width, precision);
                 break;
             // 十六进制
             case 'x':
                 flags |= SMALL;                             // 小写 16 进制
             case 'X':
-                str = number(str, va_arg(args, unsigned long), 16, flags, field_width);
+                str = number(str, va_arg(args, unsigned long), 16, flags, field_width, precision);
                 break;
             // 整数
             case 'd':
@@ -215,7 +239,7 @@ repeat:
                 flags |= SIGN;
             // unsigned
             case 'u':
-                str = number(str, va_arg(args, unsigned long), 10, flags, field_width);
+                str = number(str, va_arg(args, unsigned long), 10, flags, field_width, precision);
                 break;
             // 打印已经输出的字符数量
             case 'n':

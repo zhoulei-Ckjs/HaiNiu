@@ -156,5 +156,8 @@ void kernel_main(void)
     printk("\n------------\n");
     printk("%p~\n", p);
 
+    // 测试精度
+    printk("%16.10d~\n", 33);
+
     while (true);
 }
