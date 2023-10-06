@@ -32,7 +32,8 @@ ${BUILD}/kernel.bin: ${BUILD}/boot/head.o \
 	${BUILD}/kernel/asm/io.o \
 	${BUILD}/kernel/printk.o \
 	${BUILD}/kernel/vsprintf.o \
-	${BUILD}/lib/string.o
+	${BUILD}/lib/string.o \
+	${BUILD}/kernel/gdt.o
 	ld -m elf_i386 $^ -o $@ -Ttext 0x1200
 
 ${BUILD}/kernel/%.o: oskernel/kernel/%.c
