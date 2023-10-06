@@ -204,11 +204,15 @@ repeat:
                 break;
             // 字符串
             case 's':
+                s = va_arg(args, char *);
+                len = strlen(s);                        // 遇到 '\0' 结束
+                if (precision < 0)
+                    precision = len;
+                else if (len > precision)
+                    len = precision;
                 if (!(flags & LEFT))
                     while (len < field_width--)
                         *str++ = ' ';
-                s = va_arg(args, char *);
-                len = strlen(s);                        // 遇到 '\0' 结束
                 for (i = 0; i < len; ++i)
                     *str++ = *s++;
                 while (len < field_width--)

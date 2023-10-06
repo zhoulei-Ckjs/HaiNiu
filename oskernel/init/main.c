@@ -158,6 +158,7 @@ void kernel_main(void)
 
     // 测试精度
     printk("%16.10d~\n", 33);
+    printk("%.2s~\n", p);
 
     while (true);
 }
