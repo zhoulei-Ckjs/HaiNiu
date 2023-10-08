@@ -12,5 +12,6 @@ typedef unsigned int uint;
 
 typedef unsigned short u16;
 typedef unsigned int u32;
+typedef unsigned long long u64;
 
 #endif //HAINIU_TYPES_H

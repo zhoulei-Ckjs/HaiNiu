@@ -24,14 +24,14 @@ KERNEL_MAIN_ADDR equ 0x1200    ; kernel保存在这里，是由setup进行跳转
 gdt_base:
     dd 0, 0                     ; gdt表的最开始是一个空表，占8字节
 gdt_code:
-    dw MEMORY_LIMIT & 0xffff                            ; 段界限（15-0）
-    dw MEMORY_BASE & 0xffff                             ; 段基址（31-16）
-    db (MEMORY_BASE >> 16) & 0xff                       ; 段基址（39-32）
+    dw MEMORY_LIMIT & 0xffff                            ; 段界限（15-0）     ---> 0xffff
+    dw MEMORY_BASE & 0xffff                             ; 段基址（31-16）    ---> 0x0000
+    db (MEMORY_BASE >> 16) & 0xff                       ; 段基址（39-32）    ---> 0x00
     ;    P_DPL_S_TYPE
-    db 0b1_00_1_1010                                    ; 段描述符有效_工作在ring0_非系统段_仅具有执行权限 & 可读
+    db 0b1_00_1_1010                                    ; 段描述符有效_工作在ring0_非系统段_仅具有执行权限 & 可读     ---> 0x9A
     ;    G_DB_AVL_LIMIT
-    db 0b0_1_00_0000 | (MEMORY_LIMIT >> 16 & 0xf)       ; 以1B为单位_32位段_非64位代码段_段界限（最高4位）
-    db (MEMORY_BASE >> 24) & 0xff                       ; 段基址，31-24
+    db 0b0_1_00_0000 | (MEMORY_LIMIT >> 16 & 0xf)       ; 以1B为单位_32位段_非64位代码段_段界限（最高4位）           ---> 0xf
+    db (MEMORY_BASE >> 24) & 0xff                       ; 段基址，31-24      ---> 0x00
 gdt_data:
     dw MEMORY_LIMIT & 0xffff
     dw MEMORY_BASE & 0xffff
