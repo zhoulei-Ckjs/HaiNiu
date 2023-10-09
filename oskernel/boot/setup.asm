@@ -9,9 +9,12 @@ dw 0x55aa           ; 定义的第一个数，魔数，用于判断是否读盘�
 ;----------------
 MEMORY_BASE equ 0                                               ; 内存开始的位置：基地址
 MEMORY_LIMIT equ ((1024 * 1024 * 1024 * 4) / (1024 * 4)) - 1    ; 段界限，20位寻址能力，内存是以4k为一单位划分的
+B8000_SEG_BASE equ 0xb8000                                      ; 显存开始位置
+B8000_SEG_LIMIT equ 0x7fff                                      ; 显存长度
 ; 选择子，后面进入保护模式就是通过 选择子 访问 描述符 再+ 偏移来访问数据
 CODE_SELECTOR equ (1 << 3)                                      ; 代码段选择子，左移3位是最后三位是属性
 DATA_SELECTOR equ (2 << 3)                                      ; 数据段选择子
+B8000_SELECTOR equ (3 << 3)                                     ; 显存段选择子
 
 
 ;----------------
@@ -30,7 +33,7 @@ gdt_code:
     ;    P_DPL_S_TYPE
     db 0b1_00_1_1010                                    ; 段描述符有效_工作在ring0_非系统段_仅具有执行权限 & 可读     ---> 0x9A
     ;    G_DB_AVL_LIMIT
-    db 0b0_1_00_0000 | (MEMORY_LIMIT >> 16 & 0xf)       ; 以1B为单位_32位段_非64位代码段_段界限（最高4位）           ---> 0xf
+    db 0b1_1_00_0000 | (MEMORY_LIMIT >> 16 & 0xf)       ; 以4K为单位_32位段_非64位代码段_段界限（最高4位）           ---> 0xf
     db (MEMORY_BASE >> 24) & 0xff                       ; 段基址，31-24      ---> 0x00
 gdt_data:
     dw MEMORY_LIMIT & 0xffff
@@ -41,6 +44,15 @@ gdt_data:
     ;    G_DB_AVL_LIMIT
     db 0b1_1_00_0000 | ((MEMORY_LIMIT >> 16) & 0xf)     ; 以4KB为单位_32位段_非64位代码段_段界限（最高4位）
     db MEMORY_BASE >> 24 & 0xff
+gdt_b8000:
+    dw B8000_SEG_LIMIT & 0xffff                         ; 段界限（15-0）     ---> 0x7fff
+    dw B8000_SEG_BASE & 0xffff                          ; 段基址（31-16）    ---> 0x8000
+    db B8000_SEG_BASE >> 16 & 0xff                      ; 段基址（39-32）    ---> 0x0b
+    ;    P_DPL_S_TYPE
+    db 0b1_00_1_0010                                    ; 段描述符有效_工作在ring0_非系统段_仅具有执行权限 & 可读     ---> 0x9A
+    ;    G_DB_AVL_LIMIT
+    db 0b0_1_00_0000 | (B8000_SEG_LIMIT >> 16 & 0xf)    ; 以1B为单位_32位段_非64位代码段_段界限（最高4位）           ---> 0xf
+    db B8000_SEG_BASE >> 24 & 0xff                      ; 段基址，31-24      ---> 0x00
 ; 加载gdt表用gdt_ptr指针
 gdt_ptr:
     dw $ - gdt_base - 1         ; 这里是gdtlen - 1，长度-1

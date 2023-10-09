@@ -19,6 +19,4 @@ void gdt_init()
     printk("init gdt...\n");
     __asm__ volatile ("sgdt gdt_ptr;");             // 加载 gdt 表信息，保存到 gdt_ptr 中
     memcpy(&gdt, gdt_ptr.base, gdt_ptr.limit);      // 拷贝 gdt 中段描述符出来
-    printk("%X\n", (gdt[1]) & 0xffff);          // 0xffff
-    printk("%X\n", (gdt[1] >> 40) & 0xff);      // 0x9A
 }
