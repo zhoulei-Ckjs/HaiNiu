@@ -13,7 +13,7 @@ typedef struct xdt_ptr_t
 #pragma pack()
 
 /**
- * @brief gdt 表中每一项段描述符结构体
+ * @brief gdt 表中每一项段描述符结构体，详见 gdt 表介绍
  */
 typedef struct gdt_item_t
 {
