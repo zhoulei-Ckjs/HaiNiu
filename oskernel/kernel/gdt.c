@@ -1,6 +1,7 @@
 #include "../include/linux/kernel.h"
 #include "../include/linux/head.h"
 #include "../include/linux/types.h"
+#include "../include/asm/system.h"
 
 #define GDT_SIZE    256
 
@@ -13,6 +14,12 @@ xdt_ptr_t gdt_ptr;
  * @brief 用于存储 gdt 表中每一个段描述符，每个描述符占 8 字符
  */
 u64 gdt[GDT_SIZE] = {0};
+
+/**
+ * @brief r3 代码段和数据段选择子
+ */
+int r3_code_selector;
+int r3_data_selector;
 
 /**
  * @brief 创建 ring3 级别的代码段描述符
@@ -43,7 +50,7 @@ static void r3_gdt_code_item(int gdt_index, int base, int limit)
     item->long_mode = 0;                    // 非64位代码段
     item->big = 1;                          // 32位的段
     item->granularity = 1;                  // 4K 为单位
-    item->base_high = base >> 24 & 0xf;
+    item->base_high = base >> 24 & 0xff;
 }
 
 /**
@@ -75,7 +82,7 @@ static void r3_gdt_data_item(int gdt_index, int base, int limit)
     item->long_mode = 0;                        // 非64位代码段
     item->big = 1;                              // 32位的段
     item->granularity = 1;                      // 4K 为单位
-    item->base_high = base >> 24 & 0xf;
+    item->base_high = base >> 24 & 0xff;
 }
 
 void gdt_init()
@@ -87,4 +94,14 @@ void gdt_init()
     // 创建r3用的段描述符：代码段、数据段
     r3_gdt_code_item(4, 0, 0xfffff);        // r3 代码段
     r3_gdt_data_item(5, 0, 0xfffff);
+
+    // 创建r3用的选择子：代码段、数据段
+    r3_code_selector = 4 << 3 | 0b011;                         // 索引为4，请求特权级为 r3
+    r3_data_selector = 5 << 3 | 0b011;                         // 索引为5，请求特权级为 r3
+
+    gdt_ptr.base = &gdt;
+    gdt_ptr.limit = sizeof(gdt) - 1;
+
+    BOCHS_DEBUG_MAGIC
+    __asm__ volatile ("lgdt gdt_ptr;");                        // 重新加载 gdt 表
 }
