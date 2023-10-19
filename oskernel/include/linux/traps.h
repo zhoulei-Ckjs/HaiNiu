@@ -6,4 +6,9 @@
  */
 void gdt_init();
 
+/**
+ * @brief 初始化中断向量表 idt
+ */
+void idt_init();
+
 #endif //HAINIU_TRAPS_H
