@@ -32,7 +32,7 @@ typedef struct gdt_item_t
 } __attribute__((packed)) gdt_item_t;
 
 /**
- * @brief 中断门结构体
+ * @brief 中断门结构体，占 8 个字节。
  */
 typedef struct interrupt_gate_t
 {

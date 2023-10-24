@@ -34,7 +34,8 @@ ${BUILD}/kernel.bin: ${BUILD}/boot/head.o \
 	${BUILD}/kernel/vsprintf.o \
 	${BUILD}/lib/string.o \
 	${BUILD}/kernel/gdt.o \
-	${BUILD}/kernel/idt.o
+	${BUILD}/kernel/idt.o \
+	${BUILD}/kernel/asm/interrupt_handler.o
 	ld -m elf_i386 $^ -o $@ -Ttext 0x1200
 
 ${BUILD}/kernel/%.o: oskernel/kernel/%.c
