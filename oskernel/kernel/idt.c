@@ -1,10 +1,12 @@
 #include "../include/linux/kernel.h"
 #include "../include/linux/head.h"
 #include "../include/string.h"
+#include "../include/asm/system.h"
 
 #define INTERRUPT_TABLE_SIZE    256         // 中断门个数
 
 interrupt_gate_t interrupt_table[INTERRUPT_TABLE_SIZE] = {0};
+char idt_ptr[6] = {0};                      // 中断向量表重新指向的位置
 
 extern void interrupt_handler();
 
@@ -25,4 +27,13 @@ void idt_init()
         p->DPL = 0;           // 内核态
         p->present = 1;       // 有效
     }
+
+    /// 让CPU知道中断向量表
+    *(short*)idt_ptr = INTERRUPT_TABLE_SIZE * 8;        ///< 每个中断描述符 8 字节，共定义了 256 个。
+    *(int*)(idt_ptr + 2) = interrupt_table;             ///< 中断描述符地址
+
+    BOCHS_DEBUG_MAGIC
+    BOCHS_DEBUG_MAGIC
+
+    asm volatile("lidt idt_ptr;");
 }
