@@ -9,5 +9,7 @@ void kernel_main(void)
     gdt_init();
     idt_init();
 
+    __asm__("sti;");        ///< 开中断
+
     while (true);
 }
