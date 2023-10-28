@@ -9,14 +9,23 @@ interrupt_gate_t interrupt_table[INTERRUPT_TABLE_SIZE] = {0};
 char idt_ptr[6] = {0};                      // 中断向量表重新指向的位置
 
 extern void interrupt_handler();
+extern void keymap_handler_entry();         ///< 键盘中断
 
 void idt_init()
 {
+    printk("init idt...\n");
     for (int i = 0; i < INTERRUPT_TABLE_SIZE; ++i)
     {
         interrupt_gate_t* p = &interrupt_table[i];
 
         int handler = interrupt_handler;
+
+        /// 键盘中断
+        /// 0 - 31 是系统保留终端，32 是时钟， 33 是键盘中断
+        if (0x21 == i)
+        {
+            handler = keymap_handler_entry;
+        }
 
         p->offset0 = handler & 0xffff;
         p->offset1 = (handler >> 16) & 0xffff;
