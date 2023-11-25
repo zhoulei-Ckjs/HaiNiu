@@ -5,10 +5,12 @@
 #define EOS '\0'                        // 字符串结尾
 
 #define true 1
+#define false 0
 
 typedef unsigned char uchar;
 typedef unsigned int size_t;
 
+typedef unsigned short ushort;
 typedef unsigned int uint;
 
 typedef unsigned short u16;
