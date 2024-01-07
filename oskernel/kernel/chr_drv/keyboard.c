@@ -122,7 +122,8 @@ void keymap_handler(int idt_index)
 
     ushort makecode = (scancode & 0x7f);            ///< 获得通码
 
+    bool shift = false;                             ///< 大小写偏移
     char ch = 0;                                    ///< 这里一次按键会打印两次 a，通码一次，断码一次
-    ch = keymap[makecode][0];
+    ch = keymap[makecode][shift];
     printk("%c\n", ch);
 }

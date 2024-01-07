@@ -4,6 +4,8 @@
 #define NULL ((void *)0)                // 空指针
 #define EOS '\0'                        // 字符串结尾
 
+#define bool _Bool                      ///< _Bool 是 C 语言中的布尔数据类型
+
 #define true 1
 #define false 0
 
